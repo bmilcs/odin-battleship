@@ -1,6 +1,3 @@
 {
   "presets": [["env", {"modules": false}]],
-  "transform": {
-  "\\.[jt]sx?$": "babel-jest"
-  },
 }
