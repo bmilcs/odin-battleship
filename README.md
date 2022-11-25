@@ -27,4 +27,10 @@ In Progress
 ```sh
 # clone repo
 git clone https://github.com/bmilcs/odin-battleship
+
+# install dependencies
+npm install --save-dev webpack webpack-cli webpack-dev-server webpack-merge \
+  html-webpack-plugin style-loader css-loader sass-loader sass \
+  eslint eslint-config-prettier jest @babel/preset-env babel-jest
+npx install-peerdeps --dev eslint-config-airbnb-base
 ```
