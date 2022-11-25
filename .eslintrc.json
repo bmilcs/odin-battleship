@@ -14,5 +14,6 @@
     },
     "rules": {
     "quotes": "off",
+    "no-console": 1,
     },
 }
