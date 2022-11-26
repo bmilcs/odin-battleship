@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@900&family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Passion+One&family=Roboto:wght@400;700&display=swap');
 
 *,
 *::before,
@@ -9,7 +9,7 @@
 }
 
 :root {
-  --ff-title: 'Londrina Solid', cursive;
+  --ff-title: 'Passion One', cursive;
   --ff-main: 'Roboto', sans-serif;
 
   --clr-neutral-100: #f3f3f3;
@@ -24,10 +24,22 @@ body {
   background: var(--clr-neutral-100);
 }
 
-.page-title {
-  font-family: var(--ff-title);
-  color: var(--clr-accent-100);
-  font-size: 3.25rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+.header-container {
+  text-align: center;
+  margin-block: 1rem;
+
+  .page-title {
+    font-family: var(--ff-title);
+    font-size: 5rem;
+    font-weight: normal;
+
+    color: var(--clr-neutral-900);
+    text-transform: uppercase;
+    line-height: 0.8;
+  }
+
+  .page-subtitle {
+    text-transform: uppercase;
+    line-height: 1;
+  }
 }

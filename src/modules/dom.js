@@ -14,7 +14,8 @@ const renderLayout = () => {
 const prepHeader = () => {
   return containerize(
     'header-container',
-    makeElement('h1', 'page-title', 'Battleship')
+    makeElement('h1', 'page-title', 'Battleship'),
+    makeElement('p', 'page-subtitle', 'The Classic Naval Combat Game')
   );
 };
 
