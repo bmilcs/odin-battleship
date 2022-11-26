@@ -22,11 +22,19 @@ body {
   font-family: var(--ff-main);
   color: var(--clr-neutral-900);
   background: var(--clr-neutral-100);
+
+  display: grid;
+  grid-template-rows: min-content 1fr min-content;
+  min-height: 100vh;
 }
 
-.header-container {
+header {
   text-align: center;
-  margin-block: 1rem;
+  padding-block: 1rem;
+
+  .page-logo {
+    max-width: 12rem;
+  }
 
   .page-title {
     font-family: var(--ff-title);
