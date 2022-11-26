@@ -12,12 +12,12 @@ test("create a new gameboard array, non default size: 3", () => {
 
 test("get all positions between 2 positions", () => {
   const board = Gameboard(3);
-  expect(board.getAllPositions([0, 0], [0, 2])).toEqual([[0, 0], [0, 1], [0, 2]]);
+  expect(board.getAllPositionsBetween([0, 0], [0, 2])).toEqual([[0, 0], [0, 1], [0, 2]]);
 })
 
 test("get all positions between 2 positions", () => {
   const board = Gameboard(6);
-  expect(board.getAllPositions([0, 0], [4, 0])).toEqual([[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]);
+  expect(board.getAllPositionsBetween([0, 0], [4, 0])).toEqual([[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]);
 })
 
 test("place ship at a given position", () => {

@@ -24,15 +24,8 @@ export default (boardSize = 10) => {
 
   // place ships at positions by calling Ship factory function
   const placeShip = (startPos, endPos) => {
-    if (!positionsWithinBoard(startPos, endPos)) {
-      return "Error: Unable to place ships outside of the board."
-    }
-    if (!positionsAreEmpty(startPos, endPos)) {
-      return "Error: Unable to place ships on top of other ships!"
-    }
-
-    const allPositions = getAllPositions(startPos, endPos);
-    const newShip = Ship(allPositions.length());
+    const allPositions = getAllPositionsBetween(startPos, endPos);
+    const newShip = Ship(allPositions.length);
 
     // update board array
     allPositions.forEach(pos => {
@@ -41,7 +34,7 @@ export default (boardSize = 10) => {
     })
   }
   
-  const getAllPositions = (startPos, endPos) => {
+  const getAllPositionsBetween = (startPos, endPos) => {
     let arrayOfPositions = [];
     const [startRow, startCol] = startPos;
     const [endRow, endCol] = endPos;
@@ -99,7 +92,6 @@ export default (boardSize = 10) => {
   return {
     getArray,
     placeShip,
-    getAllPositions,
-    getAllNumbersBetween
+    getAllPositionsBetween
   }
 }
