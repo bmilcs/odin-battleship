@@ -1,5 +1,9 @@
 import Ship from './ship';
 
+//
+// Gameboard Factory
+//
+
 export default (boardSize = 10) => {
   // create gameboard of defaultSize x defaultSize
   const create = (boardSize) => {
@@ -13,30 +17,51 @@ export default (boardSize = 10) => {
     return board;
   };
 
+  // storage
+
+  const boardArr = create(boardSize);
+  const shipsArr = [];
+
   // place ships at positions by calling Ship factory function
+
   const placeShip = (startPos, endPos) => {
     const allPositions = getAllPositionsBetween(startPos, endPos);
-    const newShip = Ship(allPositions.length);
+    // create ship
+    const shipLength = allPositions.length;
+    const newShip = Ship(shipLength);
+    // id & store ship in shipsArr
+    newShip.id = shipsArr.length;
+    shipsArr.push(newShip);
 
-    // update board array
+    // update gameboard w/ ship's id
     allPositions.forEach((pos) => {
       const [row, col] = pos;
-      array[row][col] = newShip;
+      boardArr[row][col] = newShip.id;
     });
   };
 
   // receive attack: if ship is hit, send .hit()
   // if miss, record attack
+
   const receiveAttack = (coordinates) => {
     const [row, col] = coordinates;
-    const positionValue = array[row][col];
+    const currentValueOnBoard = boardArr[row][col];
 
-    if (typeof positionValue === 'Object') {
-      positionValue.hit();
+    // number = id of a ship object
+    if (typeof currentValueOnBoard === 'number') {
+      const shipID = currentValueOnBoard;
+      const ship = shipsArr[shipID];
+      ship.hit();
+      boardArr[row][col] = 'X';
     } else {
-      array[row][col] = 'X';
+      boardArr[row][col] = 'M';
     }
   };
+
+  const areAllShipsSunk = () => shipsArr.every((ship) => ship.isSunk());
+  //
+  // utility functions
+  //
 
   const getAllPositionsBetween = (startPos, endPos) => {
     let positionsArr = [];
@@ -66,6 +91,7 @@ export default (boardSize = 10) => {
   const getAllNumbersBetween = (x, y) => {
     const numbers = [];
     let high, low;
+
     if (x > y) {
       high = x;
       low = y;
@@ -73,9 +99,8 @@ export default (boardSize = 10) => {
       high = y;
       low = x;
     }
-    for (let i = low; i <= high; i++) {
-      numbers.push(i);
-    }
+
+    for (let i = low; i <= high; i++) numbers.push(i);
     return numbers;
   };
 
@@ -89,22 +114,21 @@ export default (boardSize = 10) => {
 
   // print contents of gameboard to array
   const print = () => {
-    console.log(array);
-    array.forEach((row, i) => {
+    console.log(boardArr);
+    boardArr.forEach((row, i) => {
       console.log(`${i} ${row}`);
     });
   };
 
   const getArray = () => {
-    return array;
+    return boardArr;
   };
-
-  const array = create(boardSize);
 
   return {
     getArray,
     getAllPositionsBetween,
     placeShip,
     receiveAttack,
+    areAllShipsSunk,
   };
 };
