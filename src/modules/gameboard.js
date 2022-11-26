@@ -35,26 +35,26 @@ export default (boardSize = 10) => {
   }
   
   const getAllPositionsBetween = (startPos, endPos) => {
-    let arrayOfPositions = [];
+    let positionsArr = [];
     const [startRow, startCol] = startPos;
     const [endRow, endCol] = endPos;
 
     const rowDiff = Math.abs(startRow - endRow);
 
-    // if ship is placed up/down, get all coordinates between start/end pos
+    // if ship is placed up/down, get all row #'s between start/end pos
     if (rowDiff > 0) {
       const rowNumbers = getAllNumbersBetween(startRow, endRow);
-      arrayOfPositions = rowNumbers.map((row) => {
+      positionsArr = rowNumbers.map((row) => {
         return [row, startCol];
       })
-    } else {
+    } else { // get all col #'s between start/end pos
       const colNumbers = getAllNumbersBetween(startCol, endCol);
-      arrayOfPositions = colNumbers.map((col) => {
+      positionsArr = colNumbers.map((col) => {
         return [startRow, col];
       })
     };
 
-    return arrayOfPositions;
+    return positionsArr;
   }
 
   // returns all integers between 2 or more integers
