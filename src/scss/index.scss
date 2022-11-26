@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@900&family=Roboto:wght@400;700&display=swap');
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --ff-title: 'Londrina Solid', cursive;
+  --ff-main: 'Roboto', sans-serif;
+
+  --clr-neutral-100: #f3f3f3;
+  --clr-neutral-900: #0a0a0a;
+  --clr-accent-100: #133eb6;
+}
+
+body {
+  // page defaults
+  font-family: var(--ff-main);
+  color: var(--clr-neutral-900);
+  background: var(--clr-neutral-100);
+}
+
+.page-title {
+  font-family: var(--ff-title);
+  color: var(--clr-accent-100);
+  font-size: 3.25rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}

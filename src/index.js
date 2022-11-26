@@ -1,1 +1,3 @@
-import App from 'modules/app';
+import * as APP from './modules/app';
+
+APP.start();
