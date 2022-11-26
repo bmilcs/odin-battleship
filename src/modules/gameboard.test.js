@@ -31,7 +31,7 @@ describe('gameboard factory: utility functions', () => {
   const board = Gameboard();
 
   test('get all positions between 2 positions', () => {
-    expect(board.getAllPositionsBetween([0, 0], [0, 2])).toEqual([
+    expect(board.getAllCoordinatesBetween([0, 0], [0, 2])).toEqual([
       [0, 0],
       [0, 1],
       [0, 2],
@@ -39,7 +39,7 @@ describe('gameboard factory: utility functions', () => {
   });
 
   test('get all positions between 2 positions', () => {
-    expect(board.getAllPositionsBetween([0, 0], [4, 0])).toEqual([
+    expect(board.getAllCoordinatesBetween([0, 0], [4, 0])).toEqual([
       [0, 0],
       [1, 0],
       [2, 0],

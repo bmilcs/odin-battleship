@@ -22,20 +22,20 @@ export default (boardSize = 10) => {
   const boardArr = create(boardSize);
   const shipsArr = [];
 
-  // place ships at positions by calling Ship factory function
+  // place ships at coordinates by calling Ship factory function
 
   const placeShip = (startPos, endPos) => {
-    const allPositions = getAllPositionsBetween(startPos, endPos);
+    const allCoordinates = getAllCoordinatesBetween(startPos, endPos);
     // create ship
-    const shipLength = allPositions.length;
+    const shipLength = allCoordinates.length;
     const newShip = Ship(shipLength);
     // id & store ship in shipsArr
     newShip.id = shipsArr.length;
     shipsArr.push(newShip);
 
     // update gameboard w/ ship's id
-    allPositions.forEach((pos) => {
-      const [row, col] = pos;
+    allCoordinates.forEach((coordinate) => {
+      const [row, col] = coordinate;
       boardArr[row][col] = newShip.id;
     });
   };
@@ -75,7 +75,7 @@ export default (boardSize = 10) => {
   // utility functions
   //
 
-  const getAllPositionsBetween = (startPos, endPos) => {
+  const getAllCoordinatesBetween = (startPos, endPos) => {
     let positionsArr = [];
     const [startRow, startCol] = startPos;
     const [endRow, endCol] = endPos;
@@ -138,7 +138,7 @@ export default (boardSize = 10) => {
 
   return {
     getArray,
-    getAllPositionsBetween,
+    getAllCoordinatesBetween,
     placeShip,
     receiveAttack,
     areAllShipsSunk,
