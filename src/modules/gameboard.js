@@ -116,7 +116,7 @@ export default (boardSize = 10) => {
     return numbers;
   };
 
-  const positionsWithinBoard = (startPos, endPos) => {
+  const isCoordinateInsideBoard = (position) => {
     // make sure start & end coordinates fall within the bounds of the board
   };
 
