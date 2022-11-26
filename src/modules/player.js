@@ -6,10 +6,12 @@ export function Player() {
   const playedCoordinates = [];
   const gameboard = Gameboard();
 
-  const attack = (coordinate, enemyBoard) => {
-    if (!playedCoordinates.includes(coordinate)) {
-      enemyBoard.receiveAttack(coordinate);
-      playedCoordinates.push(coordinate);
+  const attack = (coordinates, enemyBoard) => {
+    const coordinatesHaventBeenPlayed =
+      !playedCoordinates.includes(coordinates);
+    if (coordinatesHaventBeenPlayed) {
+      enemyBoard.receiveAttack(coordinates);
+      playedCoordinates.push(coordinates);
     }
   };
 
@@ -32,11 +34,12 @@ export function Computer() {
   const randomAttack = (enemyBoard) => {
     const boardArr = enemyBoard.getArray();
     const boardSize = boardArr.length;
+
     let randomCoordinates = null;
 
     while (
       randomCoordinates === null ||
-      !proto.playedCoordinates.includes(randomCoordinates)
+      proto.playedCoordinates.includes(randomCoordinates)
     )
       randomCoordinates = getRandomCoordinates(boardSize);
 

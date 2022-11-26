@@ -1,10 +1,10 @@
 import { Player, Computer } from './player';
 
-describe('new player object method tests', () => {
+describe('player object method tests', () => {
   const user = Player();
   const computer = Computer();
 
-  it("get new user's board array", () => {
+  test("get new user's board array", () => {
     expect(user.boardObj().getArray()).toEqual([
       ['', '', '', '', '', '', '', '', '', ''],
       ['', '', '', '', '', '', '', '', '', ''],
@@ -19,7 +19,7 @@ describe('new player object method tests', () => {
     ]);
   });
 
-  it("player attack computer's board at 5,1", () => {
+  test("player attack computer's board at 5,1", () => {
     user.attack([5, 1], computer.boardObj());
     expect(computer.boardObj().getArray()).toEqual([
       ['', '', '', '', '', '', '', '', '', ''],
@@ -35,7 +35,7 @@ describe('new player object method tests', () => {
     ]);
   });
 
-  it("computer attacks enemy's board at random", () => {
+  test("computer attacks enemy's board at random", () => {
     computer.randomAttack(user.boardObj());
     expect(user.boardObj().getArray()).not.toEqual([
       ['', '', '', '', '', '', '', '', '', ''],
