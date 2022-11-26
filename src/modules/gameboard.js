@@ -30,7 +30,7 @@ export default (boardSize = 10) => {
     // update board array
     allPositions.forEach(pos => {
       const [row, col] = pos;
-      array[row][col] = "X";
+      array[row][col] = newShip;
     })
   }
   
