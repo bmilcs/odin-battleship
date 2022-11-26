@@ -4,8 +4,7 @@
   "description": "Odin Project #18",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "watch": "jest --watch *.js",
+    "test": "jest --watchAll --verbose",
     "build": "webpack --config webpack.prod.js",
     "start": "webpack serve --open --config webpack.dev.js"
   },
@@ -16,6 +15,8 @@
   "keywords": [
     "tdd",
     "test-driven-development",
+    "jest",
+    "battleship",
     "javascript",
     "js"
   ],
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.19.6",
     "@babel/preset-env": "^7.20.2",
+    "@types/jest": "^29.2.3",
     "babel-jest": "^29.3.1",
     "css-loader": "^6.7.2",
     "eslint": "^8.28.0",
