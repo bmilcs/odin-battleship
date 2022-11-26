@@ -27,7 +27,7 @@ describe('gameboard factory: creating gameboards', () => {
   });
 });
 
-describe('gameboard factory: utility methods', () => {
+describe('gameboard factory: utility functions', () => {
   const board = Gameboard();
 
   test('get all positions between 2 positions', () => {
@@ -49,7 +49,7 @@ describe('gameboard factory: utility methods', () => {
   });
 });
 
-describe('gameboard factory: game play method tests', () => {
+describe('gameboard factory: game play function tests', () => {
   const board = Gameboard(3);
 
   test('placeShip: ship #0 added to gameboard array', () => {
@@ -73,6 +73,18 @@ describe('gameboard factory: game play method tests', () => {
   test('receiveAttack on coordinates with no ship: miss, record attack', () => {
     board.receiveAttack([1, 1]);
     expect(board.getArray()[1][1]).toEqual('M');
+  });
+
+  test('receiveAttack on coordinates with no ship: miss, record attack', () => {
+    board.receiveAttack([1, 2]);
+    expect(board.getArray()[1][2]).toEqual('M');
+  });
+
+  test('get all missed attacks', () => {
+    expect(board.getAllMisses()).toEqual([
+      [1, 1],
+      [1, 2],
+    ]);
   });
 
   test('receiveAttack on coordinates with a ship: hit, record attack', () => {

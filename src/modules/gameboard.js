@@ -59,6 +59,18 @@ export default (boardSize = 10) => {
   };
 
   const areAllShipsSunk = () => shipsArr.every((ship) => ship.isSunk());
+
+  // get array of miss coordinates
+  const getAllMisses = () => {
+    const missCoordinatesArr = [];
+    for (let row = 0; row < boardSize; row++) {
+      for (let col = 0; col < boardSize; col++) {
+        if (boardArr[row][col] === 'M') missCoordinatesArr.push([row, col]);
+      }
+    }
+    return missCoordinatesArr;
+  };
+
   //
   // utility functions
   //
@@ -130,5 +142,6 @@ export default (boardSize = 10) => {
     placeShip,
     receiveAttack,
     areAllShipsSunk,
+    getAllMisses,
   };
 };
