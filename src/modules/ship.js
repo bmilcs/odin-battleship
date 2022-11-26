@@ -10,5 +10,5 @@ export default (shipLength) => {
     return length === hits ? true : false;
   };
 
-  return {hit, isSunk}
-}
+  return { hit, isSunk };
+};
