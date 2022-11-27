@@ -4,7 +4,6 @@ import '../scss/index.scss';
 import '../scss/footer.scss';
 import '../scss/menu.scss';
 import githubSVG from '../assets/github.svg';
-import battleshipLogoSVG from '../assets/battleship.svg';
 import battleshipIconSVG from '../assets/battleship-icon.svg';
 import battleshipAction from '../assets/battleship-action.jpg';
 
