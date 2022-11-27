@@ -1,7 +1,13 @@
+@import './index.scss';
+
 footer {
   display: grid;
   place-items: center;
   padding-block: 1rem;
+
+  fill: var(--clr-neutral-900);
+  background: var(--clr-neutral-100);
+  box-shadow: var(--box-shadow-900);
 
   --transition: all 0.2s ease-in-out;
 
@@ -22,8 +28,7 @@ footer {
     }
 
     .github-svg {
-      height: 1.75rem;
-      fill: var(--clr-neutral-900);
+      width: 1.75rem;
     }
 
     .footer-p {
@@ -41,7 +46,7 @@ footer {
 
     &::before,
     &::after {
-      --size: 20vw;
+      --size: 5vw;
       content: '';
       display: flex;
 
