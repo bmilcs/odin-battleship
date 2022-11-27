@@ -3,7 +3,8 @@ export default function makeElement(
   classes,
   textContentOrAltOrValue,
   id,
-  srcOrHref
+  srcOrHref,
+  innerHTML
 ) {
   // minimum requirements: element type
   if (!type) return;
@@ -11,18 +12,20 @@ export default function makeElement(
   const element = document.createElement(type);
 
   // add classes, separated by spaces
-  if (classes) classes.split(" ").forEach((cls) => element.classList.add(cls));
+  if (classes) classes.split(' ').forEach((cls) => element.classList.add(cls));
 
   // add alt text if img, value if input, textContent for all other element types
-  if (type === "img") element.alt = textContentOrAltOrValue;
-  else if (type === "input") element.value = textContentOrAltOrValue;
+  if (type === 'img') element.alt = textContentOrAltOrValue;
+  else if (type === 'input') element.value = textContentOrAltOrValue;
   else element.textContent = textContentOrAltOrValue;
 
   // if img set src OR if a set href
-  if (type === "img") element.src = srcOrHref;
-  if (type === "a") element.href = srcOrHref;
+  if (type === 'img') element.src = srcOrHref;
+  if (type === 'a') element.href = srcOrHref;
 
   if (id) element.id = id;
+
+  if (innerHTML) element.innerHTML = innerHTML;
 
   return element;
 }
