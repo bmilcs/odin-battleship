@@ -1,5 +1,6 @@
 import containerize from './utility/containerize';
 import makeElement from './utility/make-element';
+import * as APP from './app';
 import '../scss/index.scss';
 import '../scss/footer.scss';
 import '../scss/menu.scss';
@@ -63,6 +64,9 @@ const clearMain = () => {
 };
 
 const renderMainMenu = () => {
+  const startGameBtn = makeElement('button', 'start-btn', 'Start Game');
+  startGameBtn.addEventListener('click', startGameHandler);
+
   containerize(
     main,
     containerize(
@@ -73,7 +77,7 @@ const renderMainMenu = () => {
         'instructions',
         'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum impedit necessitatibus distinctio corrupti porro fugiat, odit vitae soluta itaque consequuntur at sed eveniet pariatur explicabo consectetur incidunt! Maxime ullam ipsa, laudantium possimus perspiciatis omnis pariatur velit odio eveniet sint repellendus minus, tenetur expedita dolores delectus eos doloribus saepe illo impedit?'
       ),
-      makeElement('button', 'start-btn', 'Start Game')
+      startGameBtn
     )
   );
 };
@@ -90,8 +94,23 @@ const prepMainLogo = () => {
   );
 };
 
-const renderBoard = (boardArr) => {
-  //
+const startGameHandler = () => {
+  APP.startNewGame();
 };
 
-export { renderLayout, renderMainMenu };
+const renderBoard = (boardArr) => {
+  const boardRowElements = boardArr.map((row, y) => {
+    const rowDiv = makeElement('div', 'gameboard-row');
+    const cellDivs = row.map((cell, x) => {
+      const cellDiv = makeElement('div', 'gameboard-cell', cell);
+      cellDiv.setAttribute('coordinates', `${y}-${x}`);
+      return cellDiv;
+    });
+    return containerize(rowDiv, cellDivs);
+  });
+  console.log(boardRowElements);
+  const assembledBoard = containerize('gameboard-container', boardRowElements);
+  containerize(main, assembledBoard);
+};
+
+export { renderLayout, renderMainMenu, renderBoard, clearMain };

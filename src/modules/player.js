@@ -19,8 +19,13 @@ export function Player() {
     return gameboard;
   };
 
+  const boardArr = () => {
+    return gameboard.getArray();
+  };
+
   return {
     attack,
+    boardArr,
     boardObj,
     playedCoordinates,
   };

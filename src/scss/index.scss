@@ -114,3 +114,23 @@ button {
     color: var(--clr-primary-900);
   }
 }
+
+.gameboard-container {
+  --gameboard-boarder: 2px solid var(--clr-neutral-300);
+  border-right: var(--gameboard-boarder);
+  border-bottom: var(--gameboard-boarder);
+
+  background: var(--clr-neutral-200);
+  box-shadow: var(--box-shadow-100);
+
+  .gameboard-row {
+    display: flex;
+
+    .gameboard-cell {
+      min-width: 3rem;
+      aspect-ratio: 1/1;
+      border-left: var(--gameboard-boarder);
+      border-top: var(--gameboard-boarder);
+    }
+  }
+}
