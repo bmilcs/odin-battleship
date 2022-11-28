@@ -53,15 +53,17 @@ const prepFooter = () => {
   );
 };
 
-//
-// game play
-//
-
-const clearMain = () => {
-  while (main.firstChild) {
-    main.removeChild(main.lastChild);
+const clearChildren = (element) => {
+  while (element.firstChild) {
+    element.removeChild(element.lastChild);
   }
 };
+
+const clearMain = () => clearChildren(main);
+
+//
+// main menu
+//
 
 const renderMainMenu = () => {
   const startGameBtn = makeElement('button', 'start-btn', 'Start Game');
@@ -98,19 +100,72 @@ const startGameHandler = () => {
   APP.startNewGame();
 };
 
-const renderBoard = (boardArr) => {
-  const boardRowElements = boardArr.map((row, y) => {
-    const rowDiv = makeElement('div', 'gameboard-row');
+//
+// game play
+//
+
+// stored globally to reduce dom calls
+const userContainer = makeElement('div', 'player-container');
+const computerContainer = makeElement('div', 'computer-container');
+
+const renderGameplayMode = () => {
+  containerize(
+    main,
+    containerize('gameplay-container', computerContainer, userContainer)
+  );
+};
+
+const renderUserBoard = (boardArr) => {
+  const gameboard = prepBoard(boardArr, 'user');
+  clearChildren(userContainer);
+  userContainer.appendChild(gameboard);
+};
+
+const renderComputerBoard = (boardArr) => {
+  const gameboard = prepBoard(boardArr, 'computer');
+  clearChildren(computerContainer);
+  computerContainer.appendChild(gameboard);
+};
+
+const prepBoard = (boardArr, player) => {
+  // boardArr: [
+  //        row: [
+  //               cell, cell
+  //             ], ...
+
+  // map row arrays to row div containers
+  const assembledRowDivs = boardArr.map((row, y) => {
+    const rowDiv = makeElement('div', `gameboard-row ${player}-row`);
+    // map each cell to its own div
     const cellDivs = row.map((cell, x) => {
-      const cellDiv = makeElement('div', 'gameboard-cell', cell);
+      const cellDiv = makeElement('div', `gameboard-cell ${player}-cell`, cell);
       cellDiv.setAttribute('coordinates', `${y}-${x}`);
       return cellDiv;
     });
+    // append all cells to parent rowDiv
     return containerize(rowDiv, cellDivs);
   });
-  console.log(boardRowElements);
-  const assembledBoard = containerize('gameboard-container', boardRowElements);
-  containerize(main, assembledBoard);
+
+  // append all rows to a parent gameboard div container
+  const assembledBoard = containerize(
+    `gameboard-container ${player}-gameboard`,
+    assembledRowDivs
+  );
+
+  // single eventListener for all board clicks
+  assembledBoard.addEventListener('click', boardClickHandler);
+  return assembledBoard;
 };
 
-export { renderLayout, renderMainMenu, renderBoard, clearMain };
+const boardClickHandler = (e) => {
+  alert(e.target.getAttribute('coordinates'));
+};
+
+export {
+  renderLayout,
+  renderMainMenu,
+  renderGameplayMode,
+  renderUserBoard,
+  renderComputerBoard,
+  clearMain,
+};

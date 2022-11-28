@@ -1,9 +1,7 @@
 import * as DOM from './dom';
 import * as Player from './player';
-import * as Gameboard from './gameboard';
-import * as Ship from './ship';
 
-let player;
+let user;
 let computer;
 
 const start = () => {
@@ -14,15 +12,31 @@ const start = () => {
 
 const startNewGame = () => {
   DOM.clearMain();
-  resetPlayers();
-  DOM.renderBoard(player.boardArr());
-  // allow user to place ships
-  // place computer ships
-  // start
+  DOM.renderGameplayMode();
+  resetPlayerObjs();
+  setupPlayerShips();
+  DOM.renderUserBoard(user.boardArr());
+  DOM.renderComputerBoard(computer.boardArr());
 };
 
-const resetPlayers = () => {
-  player = Player.Player();
+const setupPlayerShips = () => {
+  const userBoard = user.boardObj();
+  userBoard.placeShip([1, 1], [1, 5]);
+  userBoard.placeShip([3, 0], [5, 0]);
+  userBoard.placeShip([8, 5], [8, 9]);
+  userBoard.placeShip([6, 5], [5, 5]);
+  userBoard.placeShip([3, 9], [3, 7]);
+
+  const compBoard = user.boardObj();
+  compBoard.placeShip([1, 1], [1, 5]);
+  compBoard.placeShip([3, 0], [5, 0]);
+  compBoard.placeShip([8, 5], [8, 9]);
+  compBoard.placeShip([6, 5], [5, 5]);
+  compBoard.placeShip([3, 9], [3, 7]);
+};
+
+const resetPlayerObjs = () => {
+  user = Player.Player();
   computer = Player.Computer();
 };
 
