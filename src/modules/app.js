@@ -1,43 +1,65 @@
 import * as DOM from './dom';
 import * as Player from './player';
 
-let user;
-let computer;
+let player;
+let enemy;
 
 const start = () => {
   DOM.renderLayout();
   DOM.renderMainMenu();
-  startNewGame();
+  startPreGame();
 };
 
-const startNewGame = () => {
-  DOM.clearMain();
-  DOM.renderGameplayMode();
+const startPreGame = () => {
   resetPlayerObjs();
+  DOM.clearMain();
   setupPlayerShips();
-  DOM.renderUserBoard(user.boardArr());
-  DOM.renderComputerBoard(computer.boardArr());
+  DOM.renderPreGame(player.boardArr());
+  // DOM.renderPlayerBoard(player.boardArr());
 };
 
 const setupPlayerShips = () => {
-  const userBoard = user.boardObj();
-  userBoard.placeShip([1, 1], [1, 5]);
-  userBoard.placeShip([3, 0], [5, 0]);
-  userBoard.placeShip([8, 5], [8, 9]);
-  userBoard.placeShip([6, 5], [5, 5]);
-  userBoard.placeShip([3, 9], [3, 7]);
+  const playerBoard = player.boardObj();
+  playerBoard.placeShip([1, 1], [1, 5]);
+  playerBoard.placeShip([3, 0], [5, 0]);
+  playerBoard.placeShip([8, 5], [8, 9]);
+  playerBoard.placeShip([6, 5], [5, 5]);
+  playerBoard.placeShip([3, 9], [3, 7]);
 
-  const compBoard = user.boardObj();
-  compBoard.placeShip([1, 1], [1, 5]);
-  compBoard.placeShip([3, 0], [5, 0]);
-  compBoard.placeShip([8, 5], [8, 9]);
-  compBoard.placeShip([6, 5], [5, 5]);
-  compBoard.placeShip([3, 9], [3, 7]);
+  const enemyBoard = enemy.boardObj();
+  enemyBoard.placeShip([2, 1], [2, 5]);
+  enemyBoard.placeShip([9, 3], [7, 3]);
+  enemyBoard.placeShip([1, 3], [1, 6]);
+  enemyBoard.placeShip([6, 5], [5, 5]);
+  enemyBoard.placeShip([3, 9], [3, 7]);
+};
+
+const startGamePlay = () => {
+  // ships are placed, user begins game
+  DOM.clearMain();
+  DOM.renderGamePlayMode();
+  DOM.renderEnemyBoard(enemy.boardArr());
+  DOM.renderPlayerBoard(player.boardArr());
+};
+
+const attackCoordinates = (coordinates) => {
+  const coordinatesArr = coordinates.split('-');
+  const isHit = player.attack(coordinatesArr, enemy.boardObj());
+  startGamePlay();
+  if (!isHit) {
+    // disable players turn
+    enemyAttack();
+  }
+};
+
+const enemyAttack = () => {
+  const isHit = enemy.randomAttack(player.boardObj());
+  if (isHit) enemyAttack();
 };
 
 const resetPlayerObjs = () => {
-  user = Player.Player();
-  computer = Player.Computer();
+  player = Player.Player();
+  enemy = Player.Computer();
 };
 
-export { start, startNewGame };
+export { start, startPreGame, startGamePlay, attackCoordinates };

@@ -66,8 +66,8 @@ const clearMain = () => clearChildren(main);
 //
 
 const renderMainMenu = () => {
-  const startGameBtn = makeElement('button', 'start-btn', 'Start Game');
-  startGameBtn.addEventListener('click', startGameHandler);
+  const startPreGameBtn = makeElement('button', 'start-btn', 'Start Game');
+  startPreGameBtn.addEventListener('click', startPreGameHandler);
 
   containerize(
     main,
@@ -79,7 +79,7 @@ const renderMainMenu = () => {
         'instructions',
         'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum impedit necessitatibus distinctio corrupti porro fugiat, odit vitae soluta itaque consequuntur at sed eveniet pariatur explicabo consectetur incidunt! Maxime ullam ipsa, laudantium possimus perspiciatis omnis pariatur velit odio eveniet sint repellendus minus, tenetur expedita dolores delectus eos doloribus saepe illo impedit?'
       ),
-      startGameBtn
+      startPreGameBtn
     )
   );
 };
@@ -96,38 +96,47 @@ const prepMainLogo = () => {
   );
 };
 
-const startGameHandler = () => {
-  APP.startNewGame();
+const startPreGameHandler = () => {
+  APP.startPreGame();
 };
 
 //
-// game play
+// pre-game: ship placement
 //
 
 // stored globally to reduce dom calls
-const userContainer = makeElement('div', 'player-container');
-const computerContainer = makeElement('div', 'computer-container');
+const playerContainer = makeElement('div', 'player-container');
+const enemyContainer = makeElement('div', 'enemy-container');
 
-const renderGameplayMode = () => {
+const renderPreGame = (boardArr) => {
+  // start game button
+  const startGamePlayBtn = makeElement(
+    'button',
+    'start-game-play-btn',
+    'Start Game'
+  );
+  startGamePlayBtn.addEventListener('click', startGameHandler);
+
+  // pregame place ship gameboard
+  const preGameboardContainer = makeElement('div', 'pre-game-container');
+  const gameboard = prepBoard(boardArr, 'player', preGameClickHandler);
+  preGameboardContainer.appendChild(gameboard);
+
   containerize(
     main,
-    containerize('gameplay-container', computerContainer, userContainer)
+    makeElement('h1', 'pregame-header', 'Pre-Game Setup'),
+    preGameboardContainer,
+    startGamePlayBtn
   );
 };
 
-const renderUserBoard = (boardArr) => {
-  const gameboard = prepBoard(boardArr, 'user');
-  clearChildren(userContainer);
-  userContainer.appendChild(gameboard);
+const startGameHandler = (e) => {
+  // if all ships have been placed ...
+  clearChildren(main);
+  APP.startGamePlay();
 };
 
-const renderComputerBoard = (boardArr) => {
-  const gameboard = prepBoard(boardArr, 'computer');
-  clearChildren(computerContainer);
-  computerContainer.appendChild(gameboard);
-};
-
-const prepBoard = (boardArr, player) => {
+const prepBoard = (boardArr, player, clickCallback) => {
   // boardArr: [
   //        row: [
   //               cell, cell
@@ -138,10 +147,13 @@ const prepBoard = (boardArr, player) => {
     const rowDiv = makeElement('div', `gameboard-row ${player}-row`);
     // map each cell to its own div
     const cellDivs = row.map((cell, x) => {
-      const cellDiv = makeElement('div', `gameboard-cell ${player}-cell`, cell);
+      const cellDiv = makeElement('div', `gameboard-cell ${player}-cell`);
       cellDiv.setAttribute('coordinates', `${y}-${x}`);
+      if (cell === 'X') cellDiv.classList.add('hit');
+      else if (cell === 'M') cellDiv.classList.add('miss');
       return cellDiv;
     });
+
     // append all cells to parent rowDiv
     return containerize(rowDiv, cellDivs);
   });
@@ -152,20 +164,48 @@ const prepBoard = (boardArr, player) => {
     assembledRowDivs
   );
 
-  // single eventListener for all board clicks
-  assembledBoard.addEventListener('click', boardClickHandler);
+  if (clickCallback) assembledBoard.addEventListener('click', clickCallback);
   return assembledBoard;
 };
 
-const boardClickHandler = (e) => {
+const preGameClickHandler = (e) => {
   alert(e.target.getAttribute('coordinates'));
+};
+
+//
+// game mode
+//
+
+const renderGamePlayMode = () => {
+  containerize(
+    main,
+    containerize('gameplay-container', enemyContainer, playerContainer)
+  );
+};
+
+const renderPlayerBoard = (boardArr) => {
+  const gameboard = prepBoard(boardArr, 'player');
+  clearChildren(playerContainer);
+  playerContainer.appendChild(gameboard);
+};
+
+const renderEnemyBoard = (boardArr) => {
+  const gameboard = prepBoard(boardArr, 'enemy', gamePlayClickHandler);
+  clearChildren(enemyContainer);
+  enemyContainer.appendChild(gameboard);
+};
+
+const gamePlayClickHandler = (e) => {
+  const coordinates = e.target.getAttribute('coordinates');
+  APP.attackCoordinates(coordinates);
 };
 
 export {
   renderLayout,
   renderMainMenu,
-  renderGameplayMode,
-  renderUserBoard,
-  renderComputerBoard,
+  renderPreGame,
+  renderGamePlayMode,
+  renderPlayerBoard,
+  renderEnemyBoard,
   clearMain,
 };
