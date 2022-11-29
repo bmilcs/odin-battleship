@@ -7,12 +7,11 @@ export function Player() {
   const gameboard = Gameboard();
 
   const attack = (coordinates, enemyBoard) => {
-    const coordinatesHaventBeenPlayed =
-      !playedCoordinates.includes(coordinates);
-    if (coordinatesHaventBeenPlayed) {
-      enemyBoard.receiveAttack(coordinates);
-      playedCoordinates.push(coordinates);
-    }
+    const coordinatesHaveBeenPlayed = playedCoordinates.includes(coordinates);
+    if (coordinatesHaveBeenPlayed) return;
+    playedCoordinates.push(coordinates);
+    const isHit = enemyBoard.receiveAttack(coordinates);
+    return isHit ? true : false;
   };
 
   const boardObj = () => {
@@ -48,7 +47,8 @@ export function Computer() {
     )
       randomCoordinates = getRandomCoordinates(boardSize);
 
-    proto.attack(randomCoordinates, enemyBoard);
+    const isHit = proto.attack(randomCoordinates, enemyBoard);
+    return isHit ? true : false;
   };
 
   const getRandomCoordinates = (boardSize) => {

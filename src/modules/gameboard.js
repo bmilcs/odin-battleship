@@ -53,8 +53,10 @@ export default (boardSize = 10) => {
       const ship = shipsArr[shipID];
       ship.hit();
       boardArr[row][col] = 'X';
+      return true;
     } else {
       boardArr[row][col] = 'M';
+      return false;
     }
   };
 
