@@ -43,7 +43,8 @@ const startGamePlay = () => {
 };
 
 const attackCoordinates = (coordinates) => {
-  const coordinatesArr = coordinates.split('-');
+  // split html attribute ie: 1-5 & convert to #s
+  const coordinatesArr = coordinates.split('-').map((str) => +str);
   const isHit = player.attack(coordinatesArr, enemy.boardObj());
   startGamePlay();
   if (!isHit) {
@@ -54,6 +55,8 @@ const attackCoordinates = (coordinates) => {
 
 const enemyAttack = () => {
   const isHit = enemy.randomAttack(player.boardObj());
+  startGamePlay();
+
   if (isHit) enemyAttack();
 };
 
