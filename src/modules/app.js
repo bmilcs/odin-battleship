@@ -60,6 +60,7 @@ const playerAttack = (coordinatesAttr) => {
 };
 
 const enemyAttack = (isHit = 1) => {
+  // recursively attacks until a miss occurs
   if (!isHit) return;
 
   // check for a winner
@@ -70,7 +71,7 @@ const enemyAttack = (isHit = 1) => {
 };
 
 const hasLost = (player) => {
-  alert('');
+  alert('winner winner chicken dinner');
 };
 
 const resetPlayerObjs = () => {
