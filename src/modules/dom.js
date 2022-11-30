@@ -96,9 +96,7 @@ const prepMainLogo = () => {
   );
 };
 
-const startPreGameHandler = () => {
-  APP.startPreGame();
-};
+const startPreGameHandler = () => APP.startPreGame();
 
 //
 // pre-game: ship placement

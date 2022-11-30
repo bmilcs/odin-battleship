@@ -7,8 +7,6 @@ export function Player() {
   const gameboard = Gameboard();
 
   const attack = (coordinates, enemyBoard) => {
-    // const coordinatesHaveBeenPlayed = playedCoordinates.includes(coordinates);
-    // if (coordinatesHaveBeenPlayed) return;
     playedCoordinates.push(coordinates);
     const isHit = enemyBoard.receiveAttack(coordinates);
     return isHit ? true : false;
@@ -22,10 +20,20 @@ export function Player() {
     return gameboard.getArray();
   };
 
+  const hasBeenPlayed = (coordinates) => {
+    const [row, col] = coordinates;
+    const filtered = playedCoordinates.filter((coord) => {
+      const [oldRow, oldCol] = coord;
+      if (oldRow === row && oldCol === col) return true;
+    });
+    return filtered.length === 0 ? false : true;
+  };
+
   return {
     attack,
     boardArr,
     boardObj,
+    hasBeenPlayed,
     playedCoordinates,
   };
 }
@@ -38,29 +46,16 @@ export function Computer() {
   const randomAttack = (enemyBoard) => {
     const boardArr = enemyBoard.getArray();
     const boardSize = boardArr.length;
+    let randomCoordinates;
 
-    let randomCoordinates = null;
+    while (!randomCoordinates || proto.hasBeenPlayed(randomCoordinates))
+      randomCoordinates = generateRandomCoordinates(boardSize);
 
-    while (
-      randomCoordinates === null ||
-      hasBeenPlayed(randomCoordinates, proto.playedCoordinates)
-    )
-      randomCoordinates = getRandomCoordinates(boardSize);
-
-    proto.attack(randomCoordinates, enemyBoard);
+    // attack() returns true if hit, false if not
+    return proto.attack(randomCoordinates, enemyBoard);
   };
 
-  const hasBeenPlayed = (coordinates, array) => {
-    const [row, col] = coordinates;
-    const filtered = array.filter((coord) => {
-      const [oldRow, oldCol] = coord;
-      if (oldRow === row && oldCol === col) return true;
-    });
-
-    return filtered.length === 0 ? false : true;
-  };
-
-  const getRandomCoordinates = (boardSize) => {
+  const generateRandomCoordinates = (boardSize) => {
     const randomRow = randomInt(0, boardSize - 1);
     const randomCol = randomInt(0, boardSize - 1);
     return [randomRow, randomCol];

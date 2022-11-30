@@ -118,14 +118,6 @@ export default (boardSize = 10) => {
     return numbers;
   };
 
-  const isCoordinateInsideBoard = (position) => {
-    // make sure start & end coordinates fall within the bounds of the board
-  };
-
-  const positionsAreEmpty = (startPos, endPos) => {
-    // make sure start & end coordinates are empty
-  };
-
   // print contents of gameboard to array
   const print = () => {
     console.log(boardArr);
