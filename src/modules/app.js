@@ -13,9 +13,8 @@ const start = () => {
 const startPreGame = () => {
   resetPlayerObjs();
   DOM.clearMain();
-  setupPlayerShips();
   DOM.renderPreGame(player.boardArr());
-  // DOM.renderPlayerBoard(player.boardArr());
+  setupPlayerShips();
 };
 
 const setupPlayerShips = () => {
@@ -42,22 +41,36 @@ const startGamePlay = () => {
   DOM.renderPlayerBoard(player.boardArr());
 };
 
-const attackCoordinates = (coordinates) => {
-  // split html attribute ie: 1-5 & convert to #s
-  const coordinatesArr = coordinates.split('-').map((str) => +str);
+const playerAttack = (coordinatesAttr) => {
+  // triggered via click event on enemy board
+
+  // convert coordinates from attribute string to array of numbers
+  const coordinatesArr = coordinatesAttr.split('-').map((str) => +str);
+
+  // capture result of a player's attack
   const isHit = player.attack(coordinatesArr, enemy.boardObj());
   startGamePlay();
+
+  // check for a winner
+
   if (!isHit) {
     // disable players turn
     enemyAttack();
   }
 };
 
-const enemyAttack = () => {
-  const isHit = enemy.randomAttack(player.boardObj());
-  startGamePlay();
+const enemyAttack = (isHit = 1) => {
+  if (!isHit) return;
 
-  if (isHit) enemyAttack();
+  // check for a winner
+
+  // randomAttack returns true on hit, false on miss
+  enemyAttack(enemy.randomAttack(player.boardObj()));
+  startGamePlay();
+};
+
+const hasLost = (player) => {
+  alert('');
 };
 
 const resetPlayerObjs = () => {
@@ -65,4 +78,9 @@ const resetPlayerObjs = () => {
   enemy = Player.Computer();
 };
 
-export { start, startPreGame, startGamePlay, attackCoordinates };
+export {
+  start,
+  startPreGame,
+  startGamePlay,
+  playerAttack as attackCoordinates,
+};

@@ -18,6 +18,7 @@
   --clr-neutral-700: #757575;
   --clr-neutral-900: #212121;
   --clr-accent-100: #8bc34a;
+  --clr-accent-900: #c34a4a;
   --clr-primary-100: #e4e6f1;
   --clr-primary-200: #c5cae9;
   --clr-primary-800: #3f51b5;
@@ -125,12 +126,8 @@ button {
   border-right: var(--gameboard-border);
   border-bottom: var(--gameboard-border);
 
-  background: var(--clr-neutral-200);
   box-shadow: var(--box-shadow-100);
-
-  &.inactive {
-    background: var(--clr-neutral-200);
-  }
+  background: var(--clr-neutral-100);
 
   .gameboard-row {
     display: flex;
@@ -143,6 +140,7 @@ button {
     font-family: var(--ff-main);
     font-size: 1.5rem;
     font-weight: normal;
+    color: var(--clr-neutral-700);
 
     border-left: var(--gameboard-border);
     border-top: var(--gameboard-border);
@@ -150,7 +148,14 @@ button {
     min-width: 5vw;
     aspect-ratio: 1/1;
 
-    &.inactive {
+    &.hit {
+      background: var(--clr-accent-900);
+    }
+    &.miss {
+      background: var(--clr-neutral-200);
+    }
+
+    &.player-cell {
       font-size: 0.85rem;
       min-width: 1.5rem;
     }
