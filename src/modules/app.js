@@ -47,7 +47,7 @@ const playerAttack = (coordinatesAttr) => {
   const coordinatesArr = coordinatesAttr.split('-').map((str) => +str);
 
   // prevent repeat attacks on the same position
-  const repeatPlay = player.hasBeenPlayed(coordinatesArr);
+  const repeatPlay = player.isRepeatPlay(coordinatesArr);
   if (repeatPlay) return;
 
   // capture result of a player's attack

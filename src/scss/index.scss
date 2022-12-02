@@ -151,8 +151,13 @@ button {
     &.hit {
       background: var(--clr-accent-900);
     }
+
     &.miss {
       background: var(--clr-neutral-200);
+    }
+
+    &.sunk {
+      background: var(--clr-neutral-700);
     }
 
     &.player-cell {

@@ -50,12 +50,23 @@ export default (boardSize = 10) => {
       const shipID = currentValueOnBoard;
       const shipObj = shipsArr[shipID];
       shipObj.hit();
-      boardArr[row][col] = 'X';
+      shipObj.isSunk()
+        ? sinkShipInGameboardArray(shipID)
+        : (boardArr[row][col] += 'X');
       return true;
     } else {
       boardArr[row][col] = 'M';
       return false;
     }
+  };
+
+  const sinkShipInGameboardArray = (shipID) => {
+    boardArr.forEach((row, r) => {
+      row.forEach((cell, c) => {
+        if (boardArr[r][c].toString().includes(shipID))
+          boardArr[r][c] = `${shipID}S`;
+      });
+    });
   };
 
   const areAllShipsSunk = () => shipsArr.every((ship) => ship.isSunk());

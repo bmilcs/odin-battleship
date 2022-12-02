@@ -22,7 +22,7 @@ export function Player() {
 
   // check if a coordinate has been played already
   // array.includes() doesn't work with nested arrays
-  const hasBeenPlayed = (coordinates) => {
+  const isRepeatPlay = (coordinates) => {
     const [row, col] = coordinates;
     const duplicateCoordinates = prevPlayedCoordinates.filter((coord) => {
       const [oldRow, oldCol] = coord;
@@ -35,7 +35,7 @@ export function Player() {
     attack,
     boardArr,
     boardObj,
-    hasBeenPlayed,
+    isRepeatPlay,
     prevPlayedCoordinates,
   };
 }
@@ -52,7 +52,7 @@ export function Computer() {
     let randomCoordinates;
 
     // prevent computer from making duplicate attacks
-    while (!randomCoordinates || proto.hasBeenPlayed(randomCoordinates))
+    while (!randomCoordinates || proto.isRepeatPlay(randomCoordinates))
       randomCoordinates = generateRandomCoordinates(boardSize);
 
     // attack() returns true if hit, false if not

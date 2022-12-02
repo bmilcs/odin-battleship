@@ -121,7 +121,7 @@ const renderPreGame = (boardArr) => {
   );
   startGamePlayBtn.addEventListener('click', startGameHandler);
 
-  // pregame place ship gameboard
+  // pregame place ship: player's gameboard
   const preGameboardContainer = makeElement('div', 'pre-game-container');
   const gameboard = prepBoard(boardArr, 'player', preGameClickHandler);
   preGameboardContainer.appendChild(gameboard);
@@ -134,26 +134,41 @@ const renderPreGame = (boardArr) => {
   );
 };
 
+// pregame place ships functionality
+const preGameClickHandler = (e) => {
+  alert(e.target.getAttribute('coordinates'));
+};
+
+// start game button functionality
 const startGameHandler = (e) => {
   // if all ships have been placed ...
   clearChildren(main);
   APP.startGamePlay();
 };
 
-const prepBoard = (boardArr, player, clickCallback) => {
-  // boardArr: [
-  //        row: [
-  //               cell, cell
-  //             ], ...
+// create gameboard out of player/computer gameboard array
+// and add a click event handler:
+//    boardArr: [
+//           row: [
+//                  cell, cell
+//                ], ...
 
+const prepBoard = (boardArr, player, clickCallback) => {
   // map row arrays to row div containers
   const assembledRowDivs = boardArr.map((row, y) => {
     const rowDiv = makeElement('div', `gameboard-row ${player}-row`);
+
     // map each cell to its own div
     const cellDivs = row.map((cell, x) => {
       const cellDiv = makeElement('div', `gameboard-cell ${player}-cell`);
+      // attribute: coordinates that align with the gameboard Array
       cellDiv.setAttribute('coordinates', `${y}-${x}`);
-      if (cell === 'X') cellDiv.classList.add('hit');
+      // add styling for hit but not sunk: array value = ship.id & "X"
+      // ie: array value of "1X" means: shipObj.id = 1, "X" = hit
+      if (cell.toString().includes('X')) cellDiv.classList.add('hit');
+      // add styling for sunk ship: "2S": ship.id 2, "S" = sunk
+      else if (cell.toString().includes('S')) cellDiv.classList.add('sunk');
+      // add styling for misses: "M"
       else if (cell === 'M') cellDiv.classList.add('miss');
       return cellDiv;
     });
@@ -168,12 +183,10 @@ const prepBoard = (boardArr, player, clickCallback) => {
     assembledRowDivs
   );
 
+  // add callback function as click event handler
   if (clickCallback) assembledBoard.addEventListener('click', clickCallback);
-  return assembledBoard;
-};
 
-const preGameClickHandler = (e) => {
-  alert(e.target.getAttribute('coordinates'));
+  return assembledBoard;
 };
 
 //
