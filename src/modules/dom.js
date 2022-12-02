@@ -13,6 +13,7 @@ import battleshipAction from '../assets/battleship-action.jpg';
 //
 
 const renderLayout = () => {
+  // appends <header>, <main> & <footer> to html <body>
   containerize(
     document.querySelector('body'),
     prepHeader(),
@@ -21,7 +22,15 @@ const renderLayout = () => {
   );
 };
 
+const prepMain = () => {
+  return makeElement('main');
+};
+
+// stored globally to prevent excessive dom calls
+const main = prepMain();
+
 const prepHeader = () => {
+  // creates a header element & appends <h3><div>
   return containerize(
     makeElement('header'),
     makeElement('h3', 'header-title', 'Battleship'),
@@ -36,13 +45,8 @@ const prepHeader = () => {
   );
 };
 
-const prepMain = () => {
-  return makeElement('main');
-};
-
-const main = prepMain();
-
 const prepFooter = () => {
+  // creates a footer element & appends <a> <div> <p>
   return containerize(
     makeElement('footer'),
     containerize(
@@ -107,6 +111,8 @@ const playerContainer = makeElement('div', 'player-container');
 const enemyContainer = makeElement('div', 'enemy-container');
 
 const renderPreGame = (boardArr) => {
+  clearChildren(main);
+
   // start game button
   const startGamePlayBtn = makeElement(
     'button',
@@ -174,36 +180,37 @@ const preGameClickHandler = (e) => {
 // game mode
 //
 
-const renderGamePlayMode = () => {
+const renderGameModeLayout = () => {
+  clearChildren(main);
   containerize(
     main,
     containerize('gameplay-container', enemyContainer, playerContainer)
   );
 };
 
-const renderPlayerBoard = (boardArr) => {
-  const gameboard = prepBoard(boardArr, 'player');
+const renderGameboardChanges = (enemyBoardArr, playerBoardArr) => {
   clearChildren(playerContainer);
-  playerContainer.appendChild(gameboard);
-};
-
-const renderEnemyBoard = (boardArr) => {
-  const gameboard = prepBoard(boardArr, 'enemy', gamePlayClickHandler);
   clearChildren(enemyContainer);
-  enemyContainer.appendChild(gameboard);
+  const enemyBoardElements = prepBoard(
+    enemyBoardArr,
+    'enemy',
+    attackClickHandler
+  );
+  const playerBoardElements = prepBoard(playerBoardArr, 'player');
+  enemyContainer.appendChild(enemyBoardElements);
+  playerContainer.appendChild(playerBoardElements);
 };
 
-const gamePlayClickHandler = (e) => {
+const attackClickHandler = (e) => {
   const coordinates = e.target.getAttribute('coordinates');
-  APP.attackCoordinates(coordinates);
+  APP.playerAttack(coordinates);
 };
 
 export {
   renderLayout,
   renderMainMenu,
   renderPreGame,
-  renderGamePlayMode,
-  renderPlayerBoard,
-  renderEnemyBoard,
+  renderGameModeLayout,
+  renderGameboardChanges,
   clearMain,
 };

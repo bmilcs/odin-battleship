@@ -3,11 +3,11 @@ import Gameboard from './gameboard';
 // Player Factory
 
 export function Player() {
-  const playedCoordinates = [];
+  const prevPlayedCoordinates = [];
   const gameboard = Gameboard();
 
   const attack = (coordinates, enemyBoard) => {
-    playedCoordinates.push(coordinates);
+    prevPlayedCoordinates.push(coordinates);
     const isHit = enemyBoard.receiveAttack(coordinates);
     return isHit ? true : false;
   };
@@ -20,13 +20,15 @@ export function Player() {
     return gameboard.getArray();
   };
 
+  // check if a coordinate has been played already
+  // array.includes() doesn't work with nested arrays
   const hasBeenPlayed = (coordinates) => {
     const [row, col] = coordinates;
-    const filtered = playedCoordinates.filter((coord) => {
+    const duplicateCoordinates = prevPlayedCoordinates.filter((coord) => {
       const [oldRow, oldCol] = coord;
       if (oldRow === row && oldCol === col) return true;
     });
-    return filtered.length === 0 ? false : true;
+    return duplicateCoordinates.length === 0 ? false : true;
   };
 
   return {
@@ -34,20 +36,22 @@ export function Player() {
     boardArr,
     boardObj,
     hasBeenPlayed,
-    playedCoordinates,
+    prevPlayedCoordinates,
   };
 }
 
-// Computer (Player) Factory
+// Computer Factory (inherits from Player factory)
 
 export function Computer() {
   const proto = Player();
 
+  // randomly attack a positon on the enemy's board
   const randomAttack = (enemyBoard) => {
     const boardArr = enemyBoard.getArray();
     const boardSize = boardArr.length;
     let randomCoordinates;
 
+    // prevent computer from making duplicate attacks
     while (!randomCoordinates || proto.hasBeenPlayed(randomCoordinates))
       randomCoordinates = generateRandomCoordinates(boardSize);
 

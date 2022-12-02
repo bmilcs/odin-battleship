@@ -12,7 +12,6 @@ const start = () => {
 
 const startPreGame = () => {
   resetPlayerObjs();
-  DOM.clearMain();
   DOM.renderPreGame(player.boardArr());
   setupPlayerShips();
 };
@@ -35,39 +34,44 @@ const setupPlayerShips = () => {
 
 const startGamePlay = () => {
   // ships are placed, user begins game
-  DOM.clearMain();
-  DOM.renderGamePlayMode();
-  DOM.renderEnemyBoard(enemy.boardArr());
-  DOM.renderPlayerBoard(player.boardArr());
+  DOM.renderGameModeLayout();
+  DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 };
 
-const playerAttack = (coordinatesAttr) => {
-  // triggered via click event on enemy board
+//
+// Game Play Mode
+//
 
-  // convert coordinates from attribute string to array of numbers
+const playerAttack = (coordinatesAttr) => {
+  // convert coordinates: html attribute string to array of numbers
   const coordinatesArr = coordinatesAttr.split('-').map((str) => +str);
+
+  // prevent repeat attacks on the same position
+  const repeatPlay = player.hasBeenPlayed(coordinatesArr);
+  if (repeatPlay) return;
 
   // capture result of a player's attack
   const isHit = player.attack(coordinatesArr, enemy.boardObj());
-  startGamePlay();
+
+  // update screen w/ results of the attack
+  DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 
   // check for a winner
 
   if (!isHit) {
-    // disable players turn
-    enemyAttack();
+    initiateEnemyAttack();
   }
 };
 
-const enemyAttack = (isHit = 1) => {
-  // recursively attacks until a miss occurs
+// recursively attack at random until a miss occurs
+const initiateEnemyAttack = (isHit = 1) => {
   if (!isHit) return;
 
   // check for a winner
 
   // randomAttack returns true on hit, false on miss
-  enemyAttack(enemy.randomAttack(player.boardObj()));
-  startGamePlay();
+  initiateEnemyAttack(enemy.randomAttack(player.boardObj()));
+  DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 };
 
 const hasLost = (player) => {
@@ -79,9 +83,4 @@ const resetPlayerObjs = () => {
   enemy = Player.Computer();
 };
 
-export {
-  start,
-  startPreGame,
-  startGamePlay,
-  playerAttack as attackCoordinates,
-};
+export { start, startPreGame, startGamePlay, playerAttack };

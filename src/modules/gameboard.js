@@ -1,11 +1,9 @@
 import Ship from './ship';
 
-//
 // Gameboard Factory
-//
 
 export default (boardSize = 10) => {
-  // create gameboard of defaultSize x defaultSize
+  // create gameboard array: boardSize x boardSize dimensions
   const create = (boardSize) => {
     let board = [];
     for (let row = 0; row < boardSize; row++) {
@@ -17,32 +15,32 @@ export default (boardSize = 10) => {
     return board;
   };
 
-  // storage
-
+  // storage:
   const boardArr = create(boardSize);
   const shipsArr = [];
 
-  // place ships at coordinates by calling Ship factory function
-
+  // place a ship on gameboard array, between start & end positions
   const placeShip = (startPos, endPos) => {
+    // get all cordinates between start & end position (row/column)
     const allCoordinates = getAllCoordinatesBetween(startPos, endPos);
-    // create ship
-    const shipLength = allCoordinates.length;
-    const newShip = Ship(shipLength);
-    // id & store ship in shipsArr
-    newShip.id = shipsArr.length;
-    shipsArr.push(newShip);
 
-    // update gameboard w/ ship's id
+    // create ship: size is determined by how many coordinates it contains
+    const shipLength = allCoordinates.length;
+    const shipObj = Ship(shipLength);
+
+    // id & store ship in shipsArr
+    shipObj.id = shipsArr.length;
+    shipsArr.push(shipObj);
+
+    // add ship's id to allCoordinates within the gameboard array:
     allCoordinates.forEach((coordinate) => {
       const [row, col] = coordinate;
-      boardArr[row][col] = newShip.id;
+      boardArr[row][col] = shipObj.id;
     });
   };
 
-  // receive attack: if ship is hit, send .hit()
+  // receive attack: if ship is hit, send .hit() to the corresponding ship obj
   // if miss, record attack
-
   const receiveAttack = (coordinates) => {
     const [row, col] = coordinates;
     const currentValueOnBoard = boardArr[row][col];
@@ -50,8 +48,8 @@ export default (boardSize = 10) => {
     // number = id of a ship object
     if (typeof currentValueOnBoard === 'number') {
       const shipID = currentValueOnBoard;
-      const ship = shipsArr[shipID];
-      ship.hit();
+      const shipObj = shipsArr[shipID];
+      shipObj.hit();
       boardArr[row][col] = 'X';
       return true;
     } else {
@@ -78,30 +76,31 @@ export default (boardSize = 10) => {
   //
 
   const getAllCoordinatesBetween = (startPos, endPos) => {
-    let positionsArr = [];
+    let allCoordinates = [];
     const [startRow, startCol] = startPos;
     const [endRow, endCol] = endPos;
 
+    // determine if coordinates span vertically or horizontally
     const rowDiff = Math.abs(startRow - endRow);
 
-    // if ship is placed up/down, get all row #'s between start/end pos
+    // if ship is placed vertically, get all row #'s between start/end pos
     if (rowDiff > 0) {
       const rowNumbers = getAllNumbersBetween(startRow, endRow);
-      positionsArr = rowNumbers.map((row) => {
+      allCoordinates = rowNumbers.map((row) => {
         return [row, startCol];
       });
     } else {
-      // get all col #'s between start/end pos
+      // ship is place horizontally: get all col #'s between start/end pos
       const colNumbers = getAllNumbersBetween(startCol, endCol);
-      positionsArr = colNumbers.map((col) => {
+      allCoordinates = colNumbers.map((col) => {
         return [startRow, col];
       });
     }
 
-    return positionsArr;
+    return allCoordinates;
   };
 
-  // returns all integers between 2 or more integers
+  // returns all integers between 2 integers
   const getAllNumbersBetween = (x, y) => {
     const numbers = [];
     let high, low;
