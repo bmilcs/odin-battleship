@@ -71,6 +71,18 @@ describe('gameboard factory: game play function tests', () => {
     ]);
   });
 
+  test('canPlaceShip: inside empty/legal coordinates', () => {
+    expect(board.canPlaceShip([1, 1], 'horizontal', 2)).toBe(true);
+  });
+
+  test('canPlaceShip: in coordinates used by another ship', () => {
+    expect(board.canPlaceShip([1, 0], 'horizontal', 2)).toBe(false);
+  });
+
+  test('canPlaceShip: in coordinates outside of the board', () => {
+    expect(board.canPlaceShip([2, 2], 'horizontal', 2)).toBe(false);
+  });
+
   test('areCoordinatesEmpty on an empty cell', () => {
     expect(board.areCoordinatesEmpty([1, 1])).toEqual(true);
   });

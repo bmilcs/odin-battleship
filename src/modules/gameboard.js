@@ -39,6 +39,38 @@ export default (boardSize = 10) => {
     });
   };
 
+  const canPlaceShip = (startPos, direction, shipSize) => {
+    const [startRow, startCol] = startPos;
+    let endRow = startRow;
+    let endCol = startCol;
+    if (direction === 'vertical') {
+      endCol = startCol;
+      endRow += shipSize - 1;
+    } else {
+      endRow = startRow;
+      endCol += shipSize - 1;
+    }
+    const endPos = [endRow, endCol];
+    const allCoordinates = getAllCoordinatesBetween(startPos, endPos);
+    return allCoordinates.every((coord) => areEmptyValidCoordinates(coord));
+  };
+
+  const areEmptyValidCoordinates = (coordinates) => {
+    if (!areCoordinatesInsideBoard(coordinates)) return false;
+    if (!areCoordinatesEmpty(coordinates)) return false;
+    return true;
+  };
+
+  const areCoordinatesEmpty = (coordinates) => {
+    const [row, col] = coordinates;
+    return boardArr[row][col] === '' ? true : false;
+  };
+
+  const areCoordinatesInsideBoard = (coordinates) => {
+    const [row, col] = coordinates;
+    return row >= boardSize || col >= boardSize ? false : true;
+  };
+
   // receive attack: if ship is hit, send .hit() to the corresponding ship obj
   // if miss, record attack
   const receiveAttack = (coordinates) => {
@@ -75,16 +107,6 @@ export default (boardSize = 10) => {
   };
 
   const areAllShipsSunk = () => shipsArr.every((ship) => ship.isSunk());
-
-  const areCoordinatesEmpty = (coordinates) => {
-    const [row, col] = coordinates;
-    return boardArr[row][col] === '' ? true : false;
-  };
-
-  const areCoordinatesInsideBoard = (coordinates) => {
-    const [row, col] = coordinates;
-    return row >= boardSize && col >= boardSize ? false : true;
-  };
 
   //
   // utility functions
@@ -141,6 +163,7 @@ export default (boardSize = 10) => {
     getAllCoordinatesBetween,
     areCoordinatesEmpty,
     areCoordinatesInsideBoard,
+    canPlaceShip,
     placeShip,
     receiveAttack,
     areAllShipsSunk,
