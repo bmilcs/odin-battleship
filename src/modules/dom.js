@@ -9,10 +9,9 @@ import '../scss/menu.scss';
 import githubSVG from '../assets/github.svg';
 import battleshipIconSVG from '../assets/battleship-icon.svg';
 import battleshipAction from '../assets/battleship-action.jpg';
-import { clearConfigCache } from 'prettier';
 
 //
-// main layout
+// page layout
 //
 
 const renderLayout = () => {
@@ -33,7 +32,7 @@ const prepMain = () => {
 const main = prepMain();
 
 const prepHeader = () => {
-  // creates a header element & appends <h3><div>
+  // create <header> and append <h3> <div> to it
   return containerize(
     makeElement('header'),
     makeElement('h3', 'header-title', 'Battleship'),
@@ -49,7 +48,7 @@ const prepHeader = () => {
 };
 
 const prepFooter = () => {
-  // creates a footer element & appends <a> <div> <p>
+  // create <footer> & append <a> <div> <p> to it
   return containerize(
     makeElement('footer'),
     containerize(
@@ -126,7 +125,7 @@ const renderPreGame = (boardArr) => {
 
   // pregame place ship: player's gameboard
   const preGameboardContainer = makeElement('div', 'pre-game-container');
-  const gameboard = prepBoard(boardArr, 'player', preGameClickHandler);
+  const gameboard = prepBoard(boardArr, 'pregame', preGameClickHandler);
   preGameboardContainer.appendChild(gameboard);
 
   containerize(
@@ -137,7 +136,7 @@ const renderPreGame = (boardArr) => {
   );
 };
 
-// pregame place ships functionality
+// pregame: place ships functionality
 const preGameClickHandler = (e) => {
   alert(e.target.getAttribute('coordinates'));
 };
@@ -145,11 +144,11 @@ const preGameClickHandler = (e) => {
 // start game button functionality
 const startGameHandler = (e) => {
   // if all ships have been placed ...
-  clearChildren(main);
+  clearMain();
   APP.startGamePlay();
 };
 
-// create gameboard out of player/computer gameboard array
+// create gameboard from a player/computer gameboard array
 // and add a click event handler:
 //    boardArr: [
 //           row: [
@@ -193,11 +192,11 @@ const prepBoard = (boardArr, player, clickCallback) => {
 };
 
 //
-// game mode
+// game play
 //
 
 const renderGameModeLayout = () => {
-  clearChildren(main);
+  clearMain();
   containerize(
     main,
     containerize('gameplay-container', enemyContainer, playerContainer)
@@ -224,7 +223,7 @@ const attackClickHandler = (e) => {
 };
 
 //
-// Game Over
+// game over
 //
 
 const renderGameWinner = (victorName) => {
@@ -263,7 +262,7 @@ const playAgainClickHandler = (e) => {
 };
 const returnMainMenuHandler = (e) => {
   closeGameWinner();
-  clearChildren(main);
+  clearMain();
   renderMainMenu();
 };
 
@@ -274,5 +273,4 @@ export {
   renderGameModeLayout,
   renderGameboardChanges,
   renderGameWinner,
-  clearMain,
 };

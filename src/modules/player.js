@@ -4,28 +4,31 @@ import Gameboard from './gameboard';
 
 export function Player() {
   const prevPlayedCoordinates = [];
-  const gameboard = Gameboard();
+  const gameboardObj = Gameboard();
 
-  const attack = (coordinates, enemyBoard) => {
+  const attack = (coordinates, enemyBoardObj) => {
     prevPlayedCoordinates.push(coordinates);
-    return enemyBoard.receiveAttack(coordinates);
+    // receiveAttack returns hit, miss or game over,
+    // which is controlled by app.js
+    return enemyBoardObj.receiveAttack(coordinates);
   };
 
   const boardObj = () => {
-    return gameboard;
+    return gameboardObj;
   };
 
   const boardArr = () => {
-    return gameboard.getArray();
+    return gameboardObj.getArray();
   };
 
-  // check if a coordinate has been played already
-  // array.includes() doesn't work with nested arrays
+  // check if a set of coordinates has been played already
+  // * note: array.includes() doesn't work with nested arrays
   const isRepeatPlay = (coordinates) => {
-    const [row, col] = coordinates;
+    const [targetRow, targetCol] = coordinates;
     const duplicateCoordinates = prevPlayedCoordinates.filter((coord) => {
-      const [oldRow, oldCol] = coord;
-      if (oldRow === row && oldCol === col) return true;
+      const [prevPlayedRow, prevPlayedCol] = coord;
+      if (prevPlayedRow === targetRow && prevPlayedCol === targetCol)
+        return true;
     });
     return duplicateCoordinates.length === 0 ? false : true;
   };
@@ -35,7 +38,6 @@ export function Player() {
     boardArr,
     boardObj,
     isRepeatPlay,
-    prevPlayedCoordinates,
   };
 }
 
@@ -45,8 +47,8 @@ export function Computer() {
   const proto = Player();
 
   // randomly attack a positon on the enemy's board
-  const randomAttack = (enemyBoard) => {
-    const boardArr = enemyBoard.getArray();
+  const randomAttack = (enemyBoardObj) => {
+    const boardArr = enemyBoardObj.getArray();
     const boardSize = boardArr.length;
     let randomCoordinates;
 
@@ -54,8 +56,8 @@ export function Computer() {
     while (!randomCoordinates || proto.isRepeatPlay(randomCoordinates))
       randomCoordinates = generateRandomCoordinates(boardSize);
 
-    // attack() returns true if hit, false if not
-    return proto.attack(randomCoordinates, enemyBoard);
+    // attack(): returns 'hit', 'miss', 'game over' (app.js gameflow)
+    return proto.attack(randomCoordinates, enemyBoardObj);
   };
 
   const generateRandomCoordinates = (boardSize) => {
