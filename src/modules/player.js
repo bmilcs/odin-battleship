@@ -8,8 +8,7 @@ export function Player() {
 
   const attack = (coordinates, enemyBoard) => {
     prevPlayedCoordinates.push(coordinates);
-    const isHit = enemyBoard.receiveAttack(coordinates);
-    return isHit ? true : false;
+    return enemyBoard.receiveAttack(coordinates);
   };
 
   const boardObj = () => {

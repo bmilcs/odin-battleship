@@ -89,7 +89,7 @@ describe('gameboard factory: game play function tests', () => {
 
   test('receiveAttack on coordinates with a ship: hit, record attack', () => {
     board.receiveAttack([0, 0]);
-    expect(board.getArray()[0][0]).toEqual('X');
+    expect(board.getArray()[0][0]).toEqual('0X');
   });
 
   test('areAllShipsSunk(): false test', () => {

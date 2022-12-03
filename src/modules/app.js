@@ -18,18 +18,19 @@ const startPreGame = () => {
 
 const setupPlayerShips = () => {
   const playerBoard = player.boardObj();
-  playerBoard.placeShip([1, 1], [1, 5]);
+  playerBoard.placeShip([0, 0], [0, 0]);
   playerBoard.placeShip([3, 0], [5, 0]);
   playerBoard.placeShip([8, 5], [8, 9]);
   playerBoard.placeShip([6, 5], [5, 5]);
   playerBoard.placeShip([3, 9], [3, 7]);
 
   const enemyBoard = enemy.boardObj();
-  enemyBoard.placeShip([2, 1], [2, 5]);
-  enemyBoard.placeShip([9, 3], [7, 3]);
-  enemyBoard.placeShip([1, 3], [1, 6]);
-  enemyBoard.placeShip([6, 5], [5, 5]);
-  enemyBoard.placeShip([3, 9], [3, 7]);
+  enemyBoard.placeShip([0, 0], [0, 0]);
+  // enemyBoard.placeShip([2, 1], [2, 5]);
+  // enemyBoard.placeShip([9, 3], [7, 3]);
+  // enemyBoard.placeShip([1, 3], [1, 6]);
+  // enemyBoard.placeShip([6, 5], [5, 5]);
+  // enemyBoard.placeShip([3, 9], [3, 7]);
 };
 
 const startGamePlay = () => {
@@ -51,31 +52,30 @@ const playerAttack = (coordinatesAttr) => {
   if (repeatPlay) return;
 
   // capture result of a player's attack
-  const isHit = player.attack(coordinatesArr, enemy.boardObj());
+  const attackResults = player.attack(coordinatesArr, enemy.boardObj());
 
   // update screen w/ results of the attack
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 
-  // check for a winner
-
-  if (!isHit) {
-    initiateEnemyAttack();
-  }
+  if (attackResults === 'game over') declareVictor('player');
+  else if (attackResults === 'miss') initiateEnemyAttack();
 };
 
 // recursively attack at random until a miss occurs
-const initiateEnemyAttack = (isHit = 1) => {
-  if (!isHit) return;
-
-  // check for a winner
+const initiateEnemyAttack = (attackResults) => {
+  if (attackResults === 'miss') return;
+  if (attackResults === 'game over') {
+    declareVictor('computer');
+    return;
+  }
 
   // randomAttack returns true on hit, false on miss
   initiateEnemyAttack(enemy.randomAttack(player.boardObj()));
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 };
 
-const hasLost = (player) => {
-  alert('winner winner chicken dinner');
+const declareVictor = (player) => {
+  alert(`congrats ${player}! winner winner chicken dinner`);
 };
 
 const resetPlayerObjs = () => {

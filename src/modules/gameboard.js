@@ -53,13 +53,18 @@ export default (boardSize = 10) => {
       shipObj.isSunk()
         ? sinkShipInGameboardArray(shipID)
         : (boardArr[row][col] += 'X');
-      return true;
+
+      if (areAllShipsSunk()) return 'game over';
+      return 'hit';
     } else {
       boardArr[row][col] = 'M';
-      return false;
+      return 'miss';
     }
   };
 
+  // when a final blow is landed on a ship, causing it to sink,
+  // update all references to that ship to "#S"
+  // where # = ship.id and "S" = sunk
   const sinkShipInGameboardArray = (shipID) => {
     boardArr.forEach((row, r) => {
       row.forEach((cell, c) => {
