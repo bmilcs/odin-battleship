@@ -5,6 +5,7 @@ import Gameboard from './gameboard';
 export function Player() {
   const prevPlayedCoordinates = [];
   const gameboardObj = Gameboard();
+  let placeShipCounter = 5;
 
   const attack = (coordinates, enemyBoardObj) => {
     // prevent repeat attacks on the same position
@@ -42,6 +43,7 @@ export function Player() {
     boardArr,
     boardObj,
     isRepeatPlay,
+    placeShipCounter,
   };
 }
 

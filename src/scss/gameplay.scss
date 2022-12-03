@@ -48,5 +48,8 @@
     &.place-ship {
       background: var(--clr-accent-100);
     }
+    &[class*='ship-'] {
+      background: var(--clr-neutral-200);
+    }
   }
 }

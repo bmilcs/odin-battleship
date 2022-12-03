@@ -108,12 +108,46 @@ const startPreGameHandler = () => APP.startPreGame();
 // pre-game: ship placement
 //
 
-// stored globally to reduce dom calls
+// containers for gameboards: stored globally to reduce dom calls
 const playerContainer = makeElement('div', 'player-container');
 const enemyContainer = makeElement('div', 'enemy-container');
 
 const renderPreGame = (player) => {
   const boardArr = player.boardArr();
+  const boardObj = player.boardObj();
+  const shipDirection = 'vertical';
+  let shipSize = player.placeShipCounter;
+
+  // pregame: player click to place ship at given coordinate
+  const placeShipClickHandler = (e) => {
+    const coordinatesAttr = e.target.getAttribute('coordinates');
+    if (coordinatesAttr === null) return;
+
+    const startPos = APP.parseCoordinatesAttr(coordinatesAttr);
+    const endPos = boardObj.getEndCoordinate(startPos, shipDirection, shipSize);
+    const shipCanBePlacedHere = boardObj.canPlaceShip(startPos, endPos);
+
+    if (shipCanBePlacedHere) {
+      boardObj.placeShip(startPos, endPos);
+      renderPreGame(player);
+    }
+  };
+
+  // hover enter
+  const placeShipEnterHover = (e) => {
+    const element = e.target;
+    // element.classList.add('place-ship');
+    const coordinatesAttr = e.target.getAttribute('coordinates');
+    if (coordinatesAttr === null) return;
+    const coordinates = APP.parseCoordinatesAttr(coordinatesAttr);
+  };
+
+  // hover exit
+  const placeShipExitHover = (e) => {
+    const element = e.target;
+    // element.classList.remove('place-ship');
+  };
+
   clearChildren(main);
 
   // start game button
@@ -126,7 +160,7 @@ const renderPreGame = (player) => {
 
   // display player's gameboard
   const preGameboardContainer = makeElement('div', 'pre-game-container');
-  const gameboard = prepBoard(boardArr, 'pregame', placeShipClickHandler);
+  const gameboard = prepBoard(boardArr, 'pre-game', placeShipClickHandler);
 
   // add hover event listeners
   gameboard.addEventListener('mouseenter', placeShipEnterHover);
@@ -139,27 +173,6 @@ const renderPreGame = (player) => {
     preGameboardContainer,
     startGamePlayBtn
   );
-};
-
-// pregame: place ships functionality
-const placeShipClickHandler = (e) => {
-  alert(e.target.getAttribute('coordinates'));
-};
-
-// hover enter
-const placeShipEnterHover = (e) => {
-  const element = e.target;
-  // element.classList.add('place-ship');
-  const coordinatesAttr = e.target.getAttribute('coordinates');
-  if (coordinatesAttr === null) return;
-  const coordinates = APP.parseCoordinatesAttr(coordinatesAttr);
-  console.log(coordinates);
-};
-
-// hover exit
-const placeShipExitHover = (e) => {
-  const element = e.target;
-  // element.classList.remove('place-ship');
 };
 
 // start game button functionality
