@@ -80,6 +80,16 @@ export default (boardSize = 10) => {
 
   const areAllShipsSunk = () => shipsArr.every((ship) => ship.isSunk());
 
+  const areCoordinatesEmpty = (coordinates) => {
+    const [row, col] = coordinates;
+    return boardArr[row][col] === '' ? true : false;
+  };
+
+  const areCoordinatesInsideBoard = (coordinates) => {
+    const [row, col] = coordinates;
+    return row > boardSize && col > boardSize ? false : true;
+  };
+
   //
   // utility functions
   //
@@ -133,6 +143,8 @@ export default (boardSize = 10) => {
   return {
     getArray,
     getAllCoordinatesBetween,
+    areCoordinatesEmpty,
+    areCoordinatesInsideBoard,
     placeShip,
     receiveAttack,
     areAllShipsSunk,

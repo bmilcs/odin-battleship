@@ -51,6 +51,7 @@ describe('gameboard factory: utility functions', () => {
 
 describe('gameboard factory: game play function tests', () => {
   const board = Gameboard(3);
+  const boardArr = board.getArray();
 
   test('placeShip: ship #0 added to gameboard array', () => {
     board.placeShip([0, 0], [0, 2]);
@@ -70,6 +71,22 @@ describe('gameboard factory: game play function tests', () => {
     ]);
   });
 
+  test('areCoordinatesEmpty on an empty cell', () => {
+    expect(board.areCoordinatesEmpty([1, 1])).toEqual(true);
+  });
+
+  test('areCoordinatesEmpty on a cell with a ship in it', () => {
+    expect(board.areCoordinatesEmpty([0, 0])).toEqual(false);
+  });
+
+  test('areCoordinatesInsideBoard [0, 0]', () => {
+    expect(board.areCoordinatesInsideBoard([0, 0])).toEqual(true);
+  });
+
+  test('areCoordinatesInsideBoard [4,4]', () => {
+    expect(board.areCoordinatesInsideBoard([4, 4])).toEqual(false);
+  });
+
   test('receiveAttack on coordinates with no ship: miss, record attack', () => {
     board.receiveAttack([1, 1]);
     expect(board.getArray()[1][1]).toEqual('M');
@@ -78,13 +95,6 @@ describe('gameboard factory: game play function tests', () => {
   test('receiveAttack on coordinates with no ship: miss, record attack', () => {
     board.receiveAttack([1, 2]);
     expect(board.getArray()[1][2]).toEqual('M');
-  });
-
-  test('get all missed attacks', () => {
-    expect(board.getAllMisses()).toEqual([
-      [1, 1],
-      [1, 2],
-    ]);
   });
 
   test('receiveAttack on coordinates with a ship: hit, record attack', () => {
