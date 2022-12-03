@@ -7,7 +7,6 @@ let enemy;
 const start = () => {
   DOM.renderLayout();
   DOM.renderMainMenu();
-  startPreGame();
 };
 
 const startPreGame = () => {
@@ -61,7 +60,7 @@ const playerAttack = (coordinatesAttr) => {
   else if (attackResults === 'miss') initiateEnemyAttack();
 };
 
-// recursively attack at random until a miss occurs
+// recursively attack at random until a miss or victory occurs
 const initiateEnemyAttack = (attackResults) => {
   if (attackResults === 'miss') return;
   if (attackResults === 'game over') {
@@ -69,13 +68,21 @@ const initiateEnemyAttack = (attackResults) => {
     return;
   }
 
-  // randomAttack returns true on hit, false on miss
   initiateEnemyAttack(enemy.randomAttack(player.boardObj()));
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 };
 
-const declareVictor = (player) => {
-  alert(`congrats ${player}! winner winner chicken dinner`);
+const declareVictor = (victorName) => {
+  // alert(`congrats ${victorName}! winner winner chicken dinner`);
+  DOM.renderGameWinner(victorName);
+};
+
+const returnMainMenu = () => {
+  start();
+};
+
+const playAgain = () => {
+  startPreGame();
 };
 
 const resetPlayerObjs = () => {
@@ -83,4 +90,11 @@ const resetPlayerObjs = () => {
   enemy = Player.Computer();
 };
 
-export { start, startPreGame, startGamePlay, playerAttack };
+export {
+  start,
+  startPreGame,
+  startGamePlay,
+  playerAttack,
+  returnMainMenu,
+  playAgain,
+};

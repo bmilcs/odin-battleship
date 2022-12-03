@@ -1,0 +1,20 @@
+@import 'index.scss';
+
+.game-over-modal {
+  // center modal in viewport
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background: var(--clr-neutral-100);
+  padding: 2rem;
+
+  border-radius: var(--border-radius-900);
+  box-shadow: var(--box-shadow-100);
+
+  :nth-child(n) {
+    margin: 0.5rem;
+  }
+}

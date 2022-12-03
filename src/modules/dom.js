@@ -3,10 +3,13 @@ import makeElement from './utility/make-element';
 import * as APP from './app';
 import '../scss/index.scss';
 import '../scss/footer.scss';
+import '../scss/gameplay.scss';
+import '../scss/gameover.scss';
 import '../scss/menu.scss';
 import githubSVG from '../assets/github.svg';
 import battleshipIconSVG from '../assets/battleship-icon.svg';
 import battleshipAction from '../assets/battleship-action.jpg';
+import { clearConfigCache } from 'prettier';
 
 //
 // main layout
@@ -216,7 +219,52 @@ const renderGameboardChanges = (enemyBoardArr, playerBoardArr) => {
 
 const attackClickHandler = (e) => {
   const coordinates = e.target.getAttribute('coordinates');
+  if (coordinates === null) return;
   APP.playerAttack(coordinates);
+};
+
+//
+// Game Over
+//
+
+const renderGameWinner = (victorName) => {
+  const gameOverModal = makeElement('div', 'game-over-modal');
+  const playAgainBtn = makeElement('button', 'play-again-btn', 'Play Again');
+  playAgainBtn.addEventListener('click', playAgainClickHandler);
+  const returnMainMenuBtn = makeElement(
+    'button',
+    'return-main-menu-btn',
+    'Main Menu'
+  );
+  returnMainMenuBtn.addEventListener('click', returnMainMenuHandler);
+
+  containerize(
+    gameOverModal,
+    makeElement('h2', 'gameover-header', `${victorName} is the winner!`),
+    makeElement(
+      'p',
+      'gameover-instructions',
+      'Congratulations! You have crushed your opponent. Would you like to play another round?'
+    ),
+    playAgainBtn,
+    returnMainMenuBtn
+  );
+  containerize(document.querySelector('body'), gameOverModal);
+};
+
+const closeGameWinner = () => {
+  const gameOverModal = document.querySelector('.game-over-modal');
+  gameOverModal.remove();
+};
+
+const playAgainClickHandler = (e) => {
+  closeGameWinner();
+  APP.playAgain();
+};
+const returnMainMenuHandler = (e) => {
+  closeGameWinner();
+  clearChildren(main);
+  renderMainMenu();
 };
 
 export {
@@ -225,5 +273,6 @@ export {
   renderPreGame,
   renderGameModeLayout,
   renderGameboardChanges,
+  renderGameWinner,
   clearMain,
 };
