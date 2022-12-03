@@ -83,8 +83,8 @@ describe('gameboard factory: game play function tests', () => {
     expect(board.areCoordinatesInsideBoard([0, 0])).toEqual(true);
   });
 
-  test('areCoordinatesInsideBoard [4,4]', () => {
-    expect(board.areCoordinatesInsideBoard([4, 4])).toEqual(false);
+  test('areCoordinatesInsideBoard [3, 3]', () => {
+    expect(board.areCoordinatesInsideBoard([3, 3])).toEqual(false);
   });
 
   test('receiveAttack on coordinates with no ship: miss, record attack', () => {

@@ -39,10 +39,6 @@ export default (boardSize = 10) => {
     });
   };
 
-  const placeSlipHover = (coordinates, direction) => {
-    //
-  };
-
   // receive attack: if ship is hit, send .hit() to the corresponding ship obj
   // if miss, record attack
   const receiveAttack = (coordinates) => {
@@ -87,7 +83,7 @@ export default (boardSize = 10) => {
 
   const areCoordinatesInsideBoard = (coordinates) => {
     const [row, col] = coordinates;
-    return row > boardSize && col > boardSize ? false : true;
+    return row >= boardSize && col >= boardSize ? false : true;
   };
 
   //
