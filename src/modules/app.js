@@ -1,21 +1,21 @@
 import * as DOM from './dom';
 import * as Player from './player';
 
-let player;
-let enemy;
-
 const start = () => {
   DOM.renderLayout();
   DOM.renderMainMenu();
 };
 
+let player;
+let enemy;
+
 const startPreGame = () => {
   resetPlayerObjs();
-  DOM.renderPreGame(player.boardArr());
-  setupPlayerShips();
+  DOM.renderPreGame(player);
+  // placeShipsPredefined();
 };
 
-const setupPlayerShips = () => {
+const placeShipsTest = () => {
   const playerBoard = player.boardObj();
   playerBoard.placeShip([0, 0], [0, 0]);
   playerBoard.placeShip([3, 0], [5, 0]);
@@ -25,11 +25,11 @@ const setupPlayerShips = () => {
 
   const enemyBoard = enemy.boardObj();
   enemyBoard.placeShip([0, 0], [0, 0]);
-  // enemyBoard.placeShip([2, 1], [2, 5]);
-  // enemyBoard.placeShip([9, 3], [7, 3]);
-  // enemyBoard.placeShip([1, 3], [1, 6]);
-  // enemyBoard.placeShip([6, 5], [5, 5]);
-  // enemyBoard.placeShip([3, 9], [3, 7]);
+  enemyBoard.placeShip([2, 1], [2, 5]);
+  enemyBoard.placeShip([9, 3], [7, 3]);
+  enemyBoard.placeShip([1, 3], [1, 6]);
+  enemyBoard.placeShip([6, 5], [5, 5]);
+  enemyBoard.placeShip([3, 9], [3, 7]);
 };
 
 const startGamePlay = () => {
@@ -44,11 +44,7 @@ const startGamePlay = () => {
 
 const playerAttack = (coordinatesAttr) => {
   // convert coordinates: html attribute string to array of numbers
-  const coordinatesArr = coordinatesAttr.split('-').map((str) => +str);
-
-  // prevent repeat attacks on the same position
-  const repeatPlay = player.isRepeatPlay(coordinatesArr);
-  if (repeatPlay) return;
+  const coordinatesArr = parseCoordinatesAttr(coordinatesAttr);
 
   // capture result of a player's attack
   const attackResults = player.attack(coordinatesArr, enemy.boardObj());
@@ -56,7 +52,7 @@ const playerAttack = (coordinatesAttr) => {
   // update screen w/ results of the attack
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 
-  if (attackResults === 'game over') declareVictor('player');
+  if (attackResults === 'game over') declareVictor('Player');
   else if (attackResults === 'miss') initiateEnemyAttack();
 };
 
@@ -64,7 +60,7 @@ const playerAttack = (coordinatesAttr) => {
 const initiateEnemyAttack = (attackResults) => {
   if (attackResults === 'miss') return;
   if (attackResults === 'game over') {
-    declareVictor('computer');
+    declareVictor('Computer');
     return;
   }
 
@@ -73,16 +69,11 @@ const initiateEnemyAttack = (attackResults) => {
 };
 
 const declareVictor = (victorName) => {
-  // alert(`congrats ${victorName}! winner winner chicken dinner`);
   DOM.renderGameWinner(victorName);
 };
 
-const returnMainMenu = () => {
-  start();
-};
-
-const playAgain = () => {
-  startPreGame();
+const parseCoordinatesAttr = (coordinatesAttr) => {
+  return coordinatesAttr.split('-').map((str) => +str);
 };
 
 const resetPlayerObjs = () => {
@@ -95,6 +86,5 @@ export {
   startPreGame,
   startGamePlay,
   playerAttack,
-  returnMainMenu,
-  playAgain,
+  parseCoordinatesAttr,
 };

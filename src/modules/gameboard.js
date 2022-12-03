@@ -39,13 +39,17 @@ export default (boardSize = 10) => {
     });
   };
 
+  const placeSlipHover = (coordinates, direction) => {
+    //
+  };
+
   // receive attack: if ship is hit, send .hit() to the corresponding ship obj
   // if miss, record attack
   const receiveAttack = (coordinates) => {
     const [row, col] = coordinates;
     const currentValueOnBoard = boardArr[row][col];
 
-    // number = id of a ship object
+    // pure number = untouched ship ID
     if (typeof currentValueOnBoard === 'number') {
       const shipID = currentValueOnBoard;
       const shipObj = shipsArr[shipID];
@@ -63,7 +67,7 @@ export default (boardSize = 10) => {
   };
 
   // when a final blow is landed on a ship, causing it to sink,
-  // update all references to that ship to "#S"
+  // update all references to that ship to "#S" in the gameboard array
   // where # = ship.id and "S" = sunk
   const sinkShipInGameboardArray = (shipID) => {
     boardArr.forEach((row, r) => {
@@ -75,17 +79,6 @@ export default (boardSize = 10) => {
   };
 
   const areAllShipsSunk = () => shipsArr.every((ship) => ship.isSunk());
-
-  // get array of miss coordinates
-  const getAllMisses = () => {
-    const missCoordinatesArr = [];
-    for (let row = 0; row < boardSize; row++) {
-      for (let col = 0; col < boardSize; col++) {
-        if (boardArr[row][col] === 'M') missCoordinatesArr.push([row, col]);
-      }
-    }
-    return missCoordinatesArr;
-  };
 
   //
   // utility functions
@@ -133,14 +126,6 @@ export default (boardSize = 10) => {
     return numbers;
   };
 
-  // print contents of gameboard to array
-  const print = () => {
-    console.log(boardArr);
-    boardArr.forEach((row, i) => {
-      console.log(`${i} ${row}`);
-    });
-  };
-
   const getArray = () => {
     return boardArr;
   };
@@ -151,6 +136,5 @@ export default (boardSize = 10) => {
     placeShip,
     receiveAttack,
     areAllShipsSunk,
-    getAllMisses,
   };
 };

@@ -7,6 +7,10 @@ export function Player() {
   const gameboardObj = Gameboard();
 
   const attack = (coordinates, enemyBoardObj) => {
+    // prevent repeat attacks on the same position
+    const repeatPlay = isRepeatPlay(coordinates);
+    if (repeatPlay) return 'repeat';
+
     prevPlayedCoordinates.push(coordinates);
     // receiveAttack returns hit, miss or game over,
     // which is controlled by app.js

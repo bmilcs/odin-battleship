@@ -45,5 +45,8 @@
     &.player-cell {
       min-width: 1.5rem;
     }
+    &.place-ship {
+      background: var(--clr-accent-100);
+    }
   }
 }

@@ -112,7 +112,8 @@ const startPreGameHandler = () => APP.startPreGame();
 const playerContainer = makeElement('div', 'player-container');
 const enemyContainer = makeElement('div', 'enemy-container');
 
-const renderPreGame = (boardArr) => {
+const renderPreGame = (player) => {
+  const boardArr = player.boardArr();
   clearChildren(main);
 
   // start game button
@@ -123,9 +124,13 @@ const renderPreGame = (boardArr) => {
   );
   startGamePlayBtn.addEventListener('click', startGameHandler);
 
-  // pregame place ship: player's gameboard
+  // display player's gameboard
   const preGameboardContainer = makeElement('div', 'pre-game-container');
-  const gameboard = prepBoard(boardArr, 'pregame', preGameClickHandler);
+  const gameboard = prepBoard(boardArr, 'pregame', placeShipClickHandler);
+
+  // add hover event listeners
+  gameboard.addEventListener('mouseenter', placeShipEnterHover);
+  gameboard.addEventListener('mouseexit', placeShipExitHover);
   preGameboardContainer.appendChild(gameboard);
 
   containerize(
@@ -137,8 +142,24 @@ const renderPreGame = (boardArr) => {
 };
 
 // pregame: place ships functionality
-const preGameClickHandler = (e) => {
+const placeShipClickHandler = (e) => {
   alert(e.target.getAttribute('coordinates'));
+};
+
+// hover enter
+const placeShipEnterHover = (e) => {
+  const element = e.target;
+  // element.classList.add('place-ship');
+  const coordinatesAttr = e.target.getAttribute('coordinates');
+  if (coordinatesAttr === null) return;
+  const coordinates = APP.parseCoordinatesAttr(coordinatesAttr);
+  console.log(coordinates);
+};
+
+// hover exit
+const placeShipExitHover = (e) => {
+  const element = e.target;
+  // element.classList.remove('place-ship');
 };
 
 // start game button functionality
@@ -165,6 +186,10 @@ const prepBoard = (boardArr, player, clickCallback) => {
       const cellDiv = makeElement('div', `gameboard-cell ${player}-cell`);
       // attribute: coordinates that align with the gameboard Array
       cellDiv.setAttribute('coordinates', `${y}-${x}`);
+      // pregame mode: add styling so player can see where ships are placed
+      if (player === 'pre-game') {
+        if (typeof cell === 'number') cellDiv.classList.add(`ship-${cell}`);
+      }
       // add styling for hit but not sunk: array value = ship.id & "X"
       // ie: array value of "1X" means: shipObj.id = 1, "X" = hit
       if (cell.toString().includes('X')) cellDiv.classList.add('hit');
@@ -258,7 +283,7 @@ const closeGameWinner = () => {
 
 const playAgainClickHandler = (e) => {
   closeGameWinner();
-  APP.playAgain();
+  APP.startPreGame();
 };
 const returnMainMenuHandler = (e) => {
   closeGameWinner();
