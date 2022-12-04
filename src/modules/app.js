@@ -12,7 +12,8 @@ let enemy;
 
 const startPreGame = () => {
   resetPlayerObjs();
-  DOM.renderPreGame(player);
+  // DOM.renderPreGame(player);
+  placeShipsTest();
   enemy.placeShipsRandomly();
 };
 
@@ -25,6 +26,17 @@ const startGamePlay = () => {
   // ships are placed, user begins game
   DOM.renderGameModeLayout();
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+};
+
+const placeShipsTest = () => {
+  const playerBoard = player.boardObj();
+  playerBoard.placeShip([0, 0], [0, 0]);
+  playerBoard.placeShip([2, 1], [2, 5]);
+  playerBoard.placeShip([9, 3], [7, 3]);
+  playerBoard.placeShip([1, 3], [1, 6]);
+  playerBoard.placeShip([6, 5], [5, 5]);
+  playerBoard.placeShip([3, 9], [3, 7]);
+  startGamePlay();
 };
 
 //
@@ -49,8 +61,9 @@ const initiateEnemyAttack = (attackResults) => {
     declareVictor('Computer');
     return;
   }
+  DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 
-  initiateEnemyAttack(enemy.randomAttack(player.boardObj()));
+  initiateEnemyAttack(enemy.smartAttack(player.boardObj()));
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 };
 

@@ -53,7 +53,7 @@ export function Player() {
 export function Computer() {
   const proto = Player();
 
-  // recursively place enemy ships on gameboard
+  // recursively place enemy ships on gameboard using a stack
   const placeShipsRandomly = () => {
     const shipSize = proto.placeShipList.pop();
     if (shipSize === undefined) return;
@@ -73,6 +73,14 @@ export function Computer() {
     placeShipsRandomly();
   };
 
+  //
+  // attacking functions
+  //
+
+  const successfulAttacks = [];
+  const adjacentNextMoveStack = [];
+  const linearNextMovesStack = [];
+
   // randomly attack a positon on the enemy's board
   const randomAttack = (enemyBoardObj) => {
     const boardArr = enemyBoardObj.getArray();
@@ -84,7 +92,85 @@ export function Computer() {
       randomCoordinates = generateRandomCoordinates(boardSize);
 
     // attack(): returns 'hit', 'miss', 'game over' (app.js gameflow)
-    return proto.attack(randomCoordinates, enemyBoardObj);
+    const attackResults = proto.attack(randomCoordinates, enemyBoardObj);
+    smartAttackResultsHandler(attackResults, randomCoordinates);
+
+    return attackResults;
+  };
+
+  const smartAttackResultsHandler = (attackResults, coordinates) => {
+    if (attackResults === 'hit') successfulAttacks.push(coordinates);
+    if (attackResults === 'sunk') {
+      console.log('SUNK SHIP! Clearing stacks');
+      clearAdjacentNextMovesStack();
+      clearLastSuccessfulAttack();
+      clearLinearNextMovesStack();
+    }
+  };
+
+  const clearLinearNextMovesStack = () => {
+    clearArrayValues(linearNextMovesStack);
+  };
+
+  const clearAdjacentNextMovesStack = () => {
+    clearArrayValues(adjacentNextMoveStack);
+  };
+
+  const clearLastSuccessfulAttack = () => {
+    clearArrayValues(successfulAttacks);
+  };
+
+  const clearArrayValues = (array) => {
+    while (array.length > 0) array.pop();
+  };
+
+  // smart attack
+  const smartAttack = (enemyBoardObj) => {
+    // no hits recently
+    if (successfulAttacks.length === 0 && adjacentNextMoveStack.length === 0) {
+      return randomAttack(enemyBoardObj);
+    }
+
+    // last move = hit, but no smart moves have been added to stack
+    // add all valid adjacent moves
+    if (
+      adjacentNextMoveStack.length === 0 &&
+      linearNextMovesStack.length === 0 &&
+      successfulAttacks.length === 1
+    ) {
+      const lastHit = successfulAttacks[successfulAttacks.length - 1];
+      const nextMoves = enemyBoardObj.getAllAdjectNextMoves(
+        lastHit,
+        enemyBoardObj
+      );
+      nextMoves.forEach((move) => adjacentNextMoveStack.push(move));
+    }
+
+    // 2+ successful hits have landed & ship is not sunk yet
+    // get next valid linear moves
+    if (successfulAttacks.length > 1) {
+      clearAdjacentNextMovesStack();
+      console.log('successful hits', successfulAttacks);
+      // add both direction nextvalid coord
+      const startPos = successfulAttacks[0];
+      const endPos = successfulAttacks[1];
+      console.log('hit 1', startPos, 'hit 2', endPos);
+
+      const linearMoves = enemyBoardObj.getLinearNextMoves(startPos, endPos);
+      linearMoves.forEach((move) => linearNextMovesStack.push(move));
+      console.log('next move stack:', linearNextMovesStack);
+    }
+
+    let coordinates;
+
+    adjacentNextMoveStack.length > 0
+      ? (coordinates = adjacentNextMoveStack.pop())
+      : (coordinates = linearNextMovesStack.pop());
+    console.log('testing', coordinates);
+
+    const attackResults = proto.attack(coordinates, enemyBoardObj);
+    smartAttackResultsHandler(attackResults, coordinates);
+    return attackResults;
   };
 
   const generateRandomCoordinates = (boardSize) => {
@@ -97,5 +183,5 @@ export function Computer() {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 
-  return { ...proto, randomAttack, placeShipsRandomly };
+  return { ...proto, randomAttack, smartAttack, placeShipsRandomly };
 }

@@ -68,6 +68,12 @@ export default (boardSize = 10) => {
     return true;
   };
 
+  const areUnplayedValidCoordinates = (coordinates) => {
+    if (!areCoordinatesInsideBoard(coordinates)) return false;
+    if (!areCoordinatesUnplayed(coordinates)) return false;
+    return true;
+  };
+
   const areCoordinatesEmpty = (coordinates) => {
     const [row, col] = coordinates;
     return boardArr[row][col] === '' ? true : false;
@@ -76,6 +82,18 @@ export default (boardSize = 10) => {
   const areCoordinatesInsideBoard = (coordinates) => {
     const [row, col] = coordinates;
     return row >= boardSize || col >= boardSize ? false : true;
+  };
+
+  const areCoordinatesAMiss = (coordinates) => {
+    const [row, col] = coordinates;
+    return boardArr[row][col] === 'M' ? true : false;
+  };
+
+  const areCoordinatesUnplayed = (coordinates) => {
+    const [row, col] = coordinates;
+    return boardArr[row][col] === '' || typeof boardArr[row][col] === 'number'
+      ? true
+      : false;
   };
 
   // receive attack: if ship is hit, send .hit() to the corresponding ship obj
@@ -94,7 +112,8 @@ export default (boardSize = 10) => {
         : (boardArr[row][col] += 'X');
 
       if (areAllShipsSunk()) return 'game over';
-      return 'hit';
+
+      return shipObj.isSunk() ? 'sunk' : 'hit';
     } else {
       boardArr[row][col] = 'M';
       return 'miss';
@@ -118,6 +137,77 @@ export default (boardSize = 10) => {
   //
   // utility functions
   //
+
+  // get valid moves along the axis of 2 successful hits
+  const getLinearNextMoves = (startPos, endPos, enemyBoardObj) => {
+    const linearNextMoves = [];
+    const [startRow, startCol] = startPos;
+    const [endRow, endCol] = endPos;
+    let counter = 0;
+    let coord;
+
+    if (endRow === startRow) {
+      let currentCol = startCol;
+      while (true) {
+        coord = [startRow, currentCol++];
+        if (!areCoordinatesInsideBoard(coord)) break;
+        if (areCoordinatesAMiss(coord)) break;
+        if (areCoordinatesUnplayed(coord)) {
+          linearNextMoves.push(coord);
+          break;
+        }
+      }
+      currentCol = startCol;
+      while (true) {
+        coord = [startRow, currentCol--];
+        if (!areCoordinatesInsideBoard(coord)) break;
+        if (areCoordinatesAMiss(coord)) break;
+        if (areCoordinatesUnplayed(coord)) {
+          linearNextMoves.push(coord);
+          break;
+        }
+      }
+    } else {
+      let currentRow = startRow;
+      while (true) {
+        coord = [currentRow++, startCol];
+        if (!areCoordinatesInsideBoard(coord)) break;
+        if (areCoordinatesAMiss(coord)) break;
+        if (areCoordinatesUnplayed(coord)) {
+          linearNextMoves.push(coord);
+          break;
+        }
+      }
+      currentRow = startRow;
+      while (true) {
+        coord = [currentRow--, startCol];
+        if (!areCoordinatesInsideBoard(coord)) break;
+        if (areCoordinatesAMiss(coord)) break;
+        if (areCoordinatesUnplayed(coord)) {
+          linearNextMoves.push(coord);
+          break;
+        }
+      }
+    }
+
+    return linearNextMoves;
+  };
+
+  const getAllAdjectNextMoves = (coordinates, enemyBoardObj) => {
+    const [row, col] = coordinates;
+
+    const allPossibleMoves = [];
+    allPossibleMoves.push([row + 1, col]);
+    allPossibleMoves.push([row - 1, col]);
+    allPossibleMoves.push([row, col + 1]);
+    allPossibleMoves.push([row, col - 1]);
+
+    const validNextMoves = allPossibleMoves.filter((coordinates) =>
+      enemyBoardObj.areUnplayedValidCoordinates(coordinates)
+    );
+
+    return validNextMoves;
+  };
 
   const getAllCoordinatesBetween = (startPos, endPos) => {
     let allCoordinates = [];
@@ -169,8 +259,12 @@ export default (boardSize = 10) => {
     getArray,
     getAllCoordinatesBetween,
     getEndCoordinate,
+    getAllAdjectNextMoves,
+    getLinearNextMoves,
     areCoordinatesEmpty,
     areCoordinatesInsideBoard,
+    areEmptyValidCoordinates,
+    areUnplayedValidCoordinates,
     canPlaceShipBetween,
     placeShip,
     receiveAttack,
