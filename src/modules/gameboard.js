@@ -39,19 +39,18 @@ export default (boardSize = 10) => {
     });
   };
 
-  // returns true if ship can be placed at a given coordinate/direction/size
+  // returns true if ship can be placed between two coordinates
   const canPlaceShip = (startPos, endPos) => {
-    // const endPos = getEndCoordinate(startPos, direction, shipSize);
     const allCoordinates = getAllCoordinatesBetween(startPos, endPos);
     return allCoordinates.every((coord) => areEmptyValidCoordinates(coord));
   };
 
+  // calculate end coordinate, given a starting position, direction & ship size
   const getEndCoordinate = (startPos, direction, shipSize) => {
     const [startRow, startCol] = startPos;
     let endRow = startRow;
     let endCol = startCol;
 
-    // calculate end coordinate, given a direction & ship size
     if (direction === 'vertical') {
       endCol = startCol;
       endRow += shipSize - 1;
@@ -60,7 +59,6 @@ export default (boardSize = 10) => {
       endCol += shipSize - 1;
     }
 
-    // validate every cordinate  between start & end position
     return [endRow, endCol];
   };
 
