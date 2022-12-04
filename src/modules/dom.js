@@ -115,8 +115,15 @@ const enemyContainer = makeElement('div', 'enemy-container');
 const renderPreGame = (player) => {
   const boardArr = player.boardArr();
   const boardObj = player.boardObj();
-  const shipDirection = 'vertical';
+  let shipDirection = 'vertical';
   let shipSize = player.placeShipCounter;
+
+  // shipSize starts at 5, and decrements down to 2
+  if (shipSize === 1) {
+    clearMain();
+    APP.startGamePlay();
+    return;
+  }
 
   // pregame: player click to place ship at given coordinate
   const placeShipClickHandler = (e) => {
@@ -129,28 +136,74 @@ const renderPreGame = (player) => {
 
     if (shipCanBePlacedHere) {
       boardObj.placeShip(startPos, endPos);
+      player.placeShipCounter--;
       renderPreGame(player);
     }
   };
 
-  // hover enter
-  const placeShipEnterHover = (e) => {
-    const element = e.target;
-    // element.classList.add('place-ship');
-    const coordinatesAttr = e.target.getAttribute('coordinates');
-    if (coordinatesAttr === null) return;
-    const coordinates = APP.parseCoordinatesAttr(coordinatesAttr);
+  //
+  // hover effects (when placing ships)
+  //
+
+  // removes all hover effects: on mouseleave & rotation change
+  const clearAllHoverEffects = () => {
+    const allDivs = document.querySelectorAll('.pre-game-cell');
+    for (let i = 0; i < allDivs.length; i++) {
+      allDivs[i].classList.remove('place-hover-valid');
+      allDivs[i].classList.remove('place-hover-error');
+    }
   };
 
-  // hover exit
-  const placeShipExitHover = (e) => {
-    const element = e.target;
-    // element.classList.remove('place-ship');
+  // on hovering over a new cell
+  const placeShipMouseEnter = (e) => {
+    const coordinatesAttr = e.target.getAttribute('coordinates');
+    if (coordinatesAttr === null) return;
+    displayHoverOverEffect(coordinatesAttr);
+  };
+
+  //
+  const displayHoverOverEffect = (coordinatesAttr) => {
+    const startPos = APP.parseCoordinatesAttr(coordinatesAttr);
+    const endPos = boardObj.getEndCoordinate(startPos, shipDirection, shipSize);
+    const allCoordinates = boardObj.getAllCoordinatesBetween(startPos, endPos);
+    const shipCanBePlacedHere = boardObj.canPlaceShip(startPos, endPos);
+
+    // add styling to a cell based on whether or not its position is
+    // empty & within the boundaries of the gameboard
+    allCoordinates.forEach((coord) => {
+      if (boardObj.areCoordinatesInsideBoard(coord)) {
+        const [row, col] = coord;
+        if (shipCanBePlacedHere)
+          document
+            .querySelector(`div[coordinates="${row}-${col}"]`)
+            .classList.add('place-hover-valid');
+        else
+          document
+            .querySelector(`div[coordinates="${row}-${col}"]`)
+            .classList.add('place-hover-error');
+      }
+    });
+  };
+
+  // hover exit: remove all hover effects
+  const placeShipMouseLeave = (e) => {
+    clearAllHoverEffects();
+  };
+
+  // rotate ship event
+  const rotateDirectionHandler = (e) => {
+    e.preventDefault();
+    const coordinatesAttr = e.target.getAttribute('coordinates');
+    if (coordinatesAttr === null) return;
+    shipDirection === 'vertical'
+      ? (shipDirection = 'horizontal')
+      : (shipDirection = 'vertical');
+    clearAllHoverEffects(coordinatesAttr);
+    displayHoverOverEffect(coordinatesAttr);
   };
 
   clearChildren(main);
 
-  // start game button
   const startGamePlayBtn = makeElement(
     'button',
     'start-game-play-btn',
@@ -158,18 +211,19 @@ const renderPreGame = (player) => {
   );
   startGamePlayBtn.addEventListener('click', startGameHandler);
 
-  // display player's gameboard
   const preGameboardContainer = makeElement('div', 'pre-game-container');
   const gameboard = prepBoard(boardArr, 'pre-game', placeShipClickHandler);
 
-  // add hover event listeners
-  gameboard.addEventListener('mouseenter', placeShipEnterHover);
-  gameboard.addEventListener('mouseexit', placeShipExitHover);
+  gameboard.addEventListener('mouseover', placeShipMouseEnter);
+  gameboard.addEventListener('mouseout', placeShipMouseLeave);
+  gameboard.addEventListener('contextmenu', rotateDirectionHandler);
+
   preGameboardContainer.appendChild(gameboard);
 
   containerize(
     main,
     makeElement('h1', 'pregame-header', 'Pre-Game Setup'),
+    makeElement('p', 'ship-size-description', `Place ${shipSize}x Ship`),
     preGameboardContainer,
     startGamePlayBtn
   );

@@ -12,17 +12,15 @@ let enemy;
 const startPreGame = () => {
   resetPlayerObjs();
   DOM.renderPreGame(player);
-  // placeShipsPredefined();
+  placeEnemyShips();
 };
 
-const placeShipsTest = () => {
-  const playerBoard = player.boardObj();
-  playerBoard.placeShip([0, 0], [0, 0]);
-  playerBoard.placeShip([3, 0], [5, 0]);
-  playerBoard.placeShip([8, 5], [8, 9]);
-  playerBoard.placeShip([6, 5], [5, 5]);
-  playerBoard.placeShip([3, 9], [3, 7]);
+const resetPlayerObjs = () => {
+  player = Player.Player();
+  enemy = Player.Computer();
+};
 
+const placeEnemyShips = () => {
   const enemyBoard = enemy.boardObj();
   enemyBoard.placeShip([0, 0], [0, 0]);
   enemyBoard.placeShip([2, 1], [2, 5]);
@@ -74,11 +72,6 @@ const declareVictor = (victorName) => {
 
 const parseCoordinatesAttr = (coordinatesAttr) => {
   return coordinatesAttr.split('-').map((str) => +str);
-};
-
-const resetPlayerObjs = () => {
-  player = Player.Player();
-  enemy = Player.Computer();
 };
 
 export {
