@@ -5,7 +5,7 @@ import Gameboard from './gameboard';
 export function Player() {
   const prevPlayedCoordinates = [];
   const gameboardObj = Gameboard();
-  let placeShipCounter = 5;
+  const placeShipList = [2, 3, 3, 4, 5];
 
   const attack = (coordinates, enemyBoardObj) => {
     // prevent repeat attacks on the same position
@@ -13,6 +13,7 @@ export function Player() {
     if (repeatPlay) return 'repeat';
 
     prevPlayedCoordinates.push(coordinates);
+
     // receiveAttack returns hit, miss or game over,
     // which is controlled by app.js
     return enemyBoardObj.receiveAttack(coordinates);
@@ -43,7 +44,7 @@ export function Player() {
     boardArr,
     boardObj,
     isRepeatPlay,
-    placeShipCounter,
+    placeShipList,
   };
 }
 
@@ -51,6 +52,19 @@ export function Player() {
 
 export function Computer() {
   const proto = Player();
+
+  // randomly place enemy ships on gameboard
+  const placeShipsRandomly = () => {
+    while (proto.placeShipCounter > 1) {
+      const startPos = generateRandomCoordinates(boardSize);
+      // random direction
+      // get end pos
+      // getAllCoordinatesBetween
+      // check if valid/empty
+      // place ship
+      // decrement counter
+    }
+  };
 
   // randomly attack a positon on the enemy's board
   const randomAttack = (enemyBoardObj) => {
@@ -76,5 +90,5 @@ export function Computer() {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 
-  return { ...proto, randomAttack };
+  return { ...proto, randomAttack, placeShipsRandomly };
 }

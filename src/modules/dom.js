@@ -119,12 +119,13 @@ const parseCoordinatesAttr = (coordinatesAttr) => {
 const renderPreGame = (player) => {
   const boardArr = player.boardArr();
   const boardObj = player.boardObj();
-  let shipDirection = 'vertical';
-  let shipSize = player.placeShipCounter;
 
   // renderPreGame() is called recursively,
   // placeShipSize starts at 5, and decrements down to 2
-  if (shipSize === 1) {
+  const shipSize = player.placeShipList.pop();
+  let shipDirection = 'vertical';
+
+  if (shipSize === undefined) {
     clearMain();
     APP.startGamePlay();
     return;
