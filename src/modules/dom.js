@@ -14,8 +14,8 @@ import battleshipAction from '../assets/battleship-action.jpg';
 // page layout
 //
 
+// appends <header>, <main> & <footer> to html <body>
 const renderLayout = () => {
-  // appends <header>, <main> & <footer> to html <body>
   containerize(
     document.querySelector('body'),
     prepHeader(),
@@ -31,8 +31,8 @@ const prepMain = () => {
 // stored globally to prevent excessive dom calls
 const main = prepMain();
 
+// create <header> and append <h3> <div> to it
 const prepHeader = () => {
-  // create <header> and append <h3> <div> to it
   return containerize(
     makeElement('header'),
     makeElement('h3', 'header-title', 'Battleship'),
@@ -47,8 +47,8 @@ const prepHeader = () => {
   );
 };
 
+// create <footer> & append <a> <div> <p> to it
 const prepFooter = () => {
-  // create <footer> & append <a> <div> <p> to it
   return containerize(
     makeElement('footer'),
     containerize(
@@ -330,17 +330,19 @@ const renderGameWinner = (victorName) => {
   returnMainMenuBtn.addEventListener('click', returnMainMenuHandler);
 
   containerize(
-    gameOverModal,
-    makeElement('h2', 'gameover-header', `${victorName} is the winner!`),
-    makeElement(
-      'p',
-      'gameover-instructions',
-      'Congratulations! You have crushed your opponent. Would you like to play another round?'
-    ),
-    playAgainBtn,
-    returnMainMenuBtn
+    document.querySelector('body'),
+    containerize(
+      gameOverModal,
+      makeElement('h2', 'gameover-header', `${victorName} is the winner!`),
+      makeElement(
+        'p',
+        'gameover-instructions',
+        'Congratulations! You have crushed your opponent. Would you like to play another round?'
+      ),
+      playAgainBtn,
+      returnMainMenuBtn
+    )
   );
-  containerize(document.querySelector('body'), gameOverModal);
 };
 
 const closeGameWinner = () => {
