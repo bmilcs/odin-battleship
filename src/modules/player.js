@@ -53,17 +53,24 @@ export function Player() {
 export function Computer() {
   const proto = Player();
 
-  // randomly place enemy ships on gameboard
+  // recursively place enemy ships on gameboard
   const placeShipsRandomly = () => {
-    while (proto.placeShipCounter > 1) {
-      const startPos = generateRandomCoordinates(boardSize);
-      // random direction
-      // get end pos
-      // getAllCoordinatesBetween
-      // check if valid/empty
-      // place ship
-      // decrement counter
+    const shipSize = proto.placeShipList.pop();
+    if (shipSize === undefined) return;
+
+    const boardObj = proto.boardObj();
+    const boardSize = proto.boardArr().length;
+    let startPos, endPos, shipDirection, canPlaceShipHere;
+
+    while (!canPlaceShipHere) {
+      startPos = generateRandomCoordinates(boardSize);
+      shipDirection = randomInt(0, 1) === 0 ? 'vertical' : 'horizontal';
+      endPos = boardObj.getEndCoordinate(startPos, shipDirection, shipSize);
+      canPlaceShipHere = boardObj.canPlaceShipBetween(startPos, endPos);
     }
+
+    boardObj.placeShip(startPos, endPos);
+    placeShipsRandomly();
   };
 
   // randomly attack a positon on the enemy's board

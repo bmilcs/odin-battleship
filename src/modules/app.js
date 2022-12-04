@@ -3,7 +3,8 @@ import * as Player from './player';
 
 const start = () => {
   DOM.renderLayout();
-  DOM.renderMainMenu();
+  // DOM.renderMainMenu();
+  startPreGame();
 };
 
 let player;
@@ -12,22 +13,12 @@ let enemy;
 const startPreGame = () => {
   resetPlayerObjs();
   DOM.renderPreGame(player);
-  placeEnemyShips();
+  enemy.placeShipsRandomly();
 };
 
 const resetPlayerObjs = () => {
   player = Player.Player();
   enemy = Player.Computer();
-};
-
-const placeEnemyShips = () => {
-  const enemyBoard = enemy.boardObj();
-  enemyBoard.placeShip([0, 0], [0, 0]);
-  enemyBoard.placeShip([2, 1], [2, 5]);
-  enemyBoard.placeShip([9, 3], [7, 3]);
-  enemyBoard.placeShip([1, 3], [1, 6]);
-  enemyBoard.placeShip([6, 5], [5, 5]);
-  enemyBoard.placeShip([3, 9], [3, 7]);
 };
 
 const startGamePlay = () => {
