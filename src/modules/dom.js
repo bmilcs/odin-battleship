@@ -24,12 +24,8 @@ const renderLayout = () => {
   );
 };
 
-const prepMain = () => {
-  return makeElement('main');
-};
-
-// stored globally to prevent excessive dom calls
-const main = prepMain();
+// stored globally to avoid extra dom calls
+const main = makeElement('main');
 
 // create <header> and append <h3> <div> to it
 const prepHeader = () => {
@@ -47,7 +43,7 @@ const prepHeader = () => {
   );
 };
 
-// create <footer> & append <a> <div> <p> to it
+// create <footer> & append <a> <div> <p> </a> to it
 const prepFooter = () => {
   return containerize(
     makeElement('footer'),
@@ -59,12 +55,14 @@ const prepFooter = () => {
   );
 };
 
+// remove all child elements from a parent element
 const clearChildren = (element) => {
   while (element.firstChild) {
     element.removeChild(element.lastChild);
   }
 };
 
+// clear <main>'s children
 const clearMain = () => clearChildren(main);
 
 //
@@ -112,27 +110,34 @@ const startPreGameHandler = () => APP.startPreGame();
 const playerContainer = makeElement('div', 'player-container');
 const enemyContainer = makeElement('div', 'enemy-container');
 
+// convert html attribute to coordinate array: required by rest of app
+const parseCoordinatesAttr = (coordinatesAttr) => {
+  return coordinatesAttr.split('-').map((str) => +str);
+};
+
+// render's player's board & add ship placement functionality
 const renderPreGame = (player) => {
   const boardArr = player.boardArr();
   const boardObj = player.boardObj();
   let shipDirection = 'vertical';
   let shipSize = player.placeShipCounter;
 
-  // shipSize starts at 5, and decrements down to 2
+  // renderPreGame() is called recursively,
+  // placeShipSize starts at 5, and decrements down to 2
   if (shipSize === 1) {
     clearMain();
     APP.startGamePlay();
     return;
   }
 
-  // pregame: player click to place ship at given coordinate
+  // click: place ship at given coordinate
   const placeShipClickHandler = (e) => {
     const coordinatesAttr = e.target.getAttribute('coordinates');
     if (coordinatesAttr === null) return;
 
-    const startPos = APP.parseCoordinatesAttr(coordinatesAttr);
+    const startPos = parseCoordinatesAttr(coordinatesAttr);
     const endPos = boardObj.getEndCoordinate(startPos, shipDirection, shipSize);
-    const shipCanBePlacedHere = boardObj.canPlaceShip(startPos, endPos);
+    const shipCanBePlacedHere = boardObj.canPlaceShipBetween(startPos, endPos);
 
     if (shipCanBePlacedHere) {
       boardObj.placeShip(startPos, endPos);
@@ -141,32 +146,19 @@ const renderPreGame = (player) => {
     }
   };
 
-  //
-  // hover effects (when placing ships)
-  //
-
-  // removes all hover effects: on mouseleave & rotation change
-  const clearAllHoverEffects = () => {
-    const allDivs = document.querySelectorAll('.pre-game-cell');
-    for (let i = 0; i < allDivs.length; i++) {
-      allDivs[i].classList.remove('place-hover-valid');
-      allDivs[i].classList.remove('place-hover-error');
-    }
-  };
-
-  // on hovering over a new cell
+  // adds hover effect when hover enters a new cell
   const placeShipMouseEnter = (e) => {
     const coordinatesAttr = e.target.getAttribute('coordinates');
     if (coordinatesAttr === null) return;
-    displayHoverOverEffect(coordinatesAttr);
+    displayHoverEffect(coordinatesAttr);
   };
 
-  //
-  const displayHoverOverEffect = (coordinatesAttr) => {
-    const startPos = APP.parseCoordinatesAttr(coordinatesAttr);
+  // highlights ship placement across multiple cells in the gameboard grid
+  const displayHoverEffect = (coordinatesAttr) => {
+    const startPos = parseCoordinatesAttr(coordinatesAttr);
     const endPos = boardObj.getEndCoordinate(startPos, shipDirection, shipSize);
     const allCoordinates = boardObj.getAllCoordinatesBetween(startPos, endPos);
-    const shipCanBePlacedHere = boardObj.canPlaceShip(startPos, endPos);
+    const shipCanBePlacedHere = boardObj.canPlaceShipBetween(startPos, endPos);
 
     // add styling to a cell based on whether or not its position is
     // empty & within the boundaries of the gameboard
@@ -185,7 +177,16 @@ const renderPreGame = (player) => {
     });
   };
 
-  // hover exit: remove all hover effects
+  // remove all hover effects: on mouseleave & rotation change
+  const clearAllHoverEffects = () => {
+    const allDivs = document.querySelectorAll('.pre-game-cell');
+    for (let i = 0; i < allDivs.length; i++) {
+      allDivs[i].classList.remove('place-hover-valid');
+      allDivs[i].classList.remove('place-hover-error');
+    }
+  };
+
+  // on hover leaving a cell
   const placeShipMouseLeave = (e) => {
     clearAllHoverEffects();
   };
@@ -199,39 +200,32 @@ const renderPreGame = (player) => {
       ? (shipDirection = 'horizontal')
       : (shipDirection = 'vertical');
     clearAllHoverEffects(coordinatesAttr);
-    displayHoverOverEffect(coordinatesAttr);
+    displayHoverEffect(coordinatesAttr);
   };
 
+  // render elements & apply above eventhandlers
   clearChildren(main);
 
-  const startGamePlayBtn = makeElement(
-    'button',
-    'start-game-play-btn',
-    'Start Game'
-  );
-  startGamePlayBtn.addEventListener('click', startGameHandler);
+  const startGameBtn = makeElement('button', 'start-game-btn', 'Start Game');
+  startGameBtn.addEventListener('click', startGameHandler);
 
-  const preGameboardContainer = makeElement('div', 'pre-game-container');
   const gameboard = prepBoard(boardArr, 'pre-game', placeShipClickHandler);
 
   gameboard.addEventListener('mouseover', placeShipMouseEnter);
   gameboard.addEventListener('mouseout', placeShipMouseLeave);
   gameboard.addEventListener('contextmenu', rotateDirectionHandler);
 
-  preGameboardContainer.appendChild(gameboard);
-
   containerize(
     main,
     makeElement('h1', 'pregame-header', 'Pre-Game Setup'),
     makeElement('p', 'ship-size-description', `Place ${shipSize}x Ship`),
-    preGameboardContainer,
-    startGamePlayBtn
+    gameboard,
+    startGameBtn
   );
 };
 
 // start game button functionality
 const startGameHandler = (e) => {
-  // if all ships have been placed ...
   clearMain();
   APP.startGamePlay();
 };
@@ -309,8 +303,9 @@ const renderGameboardChanges = (enemyBoardArr, playerBoardArr) => {
 };
 
 const attackClickHandler = (e) => {
-  const coordinates = e.target.getAttribute('coordinates');
-  if (coordinates === null) return;
+  const coordinatesAttr = e.target.getAttribute('coordinates');
+  if (coordinatesAttr === null) return;
+  const coordinates = parseCoordinatesAttr(coordinatesAttr);
   APP.playerAttack(coordinates);
 };
 

@@ -40,12 +40,9 @@ const startGamePlay = () => {
 // Game Play Mode
 //
 
-const playerAttack = (coordinatesAttr) => {
-  // convert coordinates: html attribute string to array of numbers
-  const coordinatesArr = parseCoordinatesAttr(coordinatesAttr);
-
+const playerAttack = (coordinates) => {
   // capture result of a player's attack
-  const attackResults = player.attack(coordinatesArr, enemy.boardObj());
+  const attackResults = player.attack(coordinates, enemy.boardObj());
 
   // update screen w/ results of the attack
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
@@ -70,14 +67,4 @@ const declareVictor = (victorName) => {
   DOM.renderGameWinner(victorName);
 };
 
-const parseCoordinatesAttr = (coordinatesAttr) => {
-  return coordinatesAttr.split('-').map((str) => +str);
-};
-
-export {
-  start,
-  startPreGame,
-  startGamePlay,
-  playerAttack,
-  parseCoordinatesAttr,
-};
+export { start, startPreGame, startGamePlay, playerAttack };
