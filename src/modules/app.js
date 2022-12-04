@@ -3,8 +3,7 @@ import * as Player from './player';
 
 const start = () => {
   DOM.renderLayout();
-  // DOM.renderMainMenu();
-  startPreGame();
+  DOM.renderMainMenu();
 };
 
 let player;
@@ -12,8 +11,8 @@ let enemy;
 
 const startPreGame = () => {
   resetPlayerObjs();
-  // DOM.renderPreGame(player);
-  placeShipsTest();
+  DOM.renderPreGame(player);
+  // placeShipsTest();
   enemy.placeShipsRandomly();
 };
 
@@ -61,10 +60,11 @@ const initiateEnemyAttack = (attackResults) => {
     declareVictor('Computer');
     return;
   }
-  DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
-
-  initiateEnemyAttack(enemy.smartAttack(player.boardObj()));
-  DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+  // DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+  setTimeout(() => {
+    initiateEnemyAttack(enemy.smartAttack(player.boardObj()));
+    DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+  }, 200);
 };
 
 const declareVictor = (victorName) => {

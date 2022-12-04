@@ -81,7 +81,9 @@ export default (boardSize = 10) => {
 
   const areCoordinatesInsideBoard = (coordinates) => {
     const [row, col] = coordinates;
-    return row >= boardSize || col >= boardSize ? false : true;
+    return row >= boardSize || row < 0 || col >= boardSize || col < 0
+      ? false
+      : true;
   };
 
   const areCoordinatesAMiss = (coordinates) => {
@@ -139,11 +141,10 @@ export default (boardSize = 10) => {
   //
 
   // get valid moves along the axis of 2 successful hits
-  const getLinearNextMoves = (startPos, endPos, enemyBoardObj) => {
+  const getLinearNextMoves = (startPos, endPos) => {
     const linearNextMoves = [];
     const [startRow, startCol] = startPos;
     const [endRow, endCol] = endPos;
-    let counter = 0;
     let coord;
 
     if (endRow === startRow) {

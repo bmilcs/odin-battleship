@@ -88,8 +88,16 @@ export function Computer() {
     let randomCoordinates;
 
     // prevent computer from making duplicate attacks
-    while (!randomCoordinates || proto.isRepeatPlay(randomCoordinates))
+    while (true) {
       randomCoordinates = generateRandomCoordinates(boardSize);
+      if (proto.isRepeatPlay(randomCoordinates)) continue;
+      // ignore squares with no adjacent openings (can't possibly be a ship)
+      const adjacentMoves = enemyBoardObj.getAllAdjectNextMoves(
+        randomCoordinates,
+        enemyBoardObj
+      );
+      if (adjacentMoves.length > 0) break;
+    }
 
     // attack(): returns 'hit', 'miss', 'game over' (app.js gameflow)
     const attackResults = proto.attack(randomCoordinates, enemyBoardObj);
@@ -101,7 +109,6 @@ export function Computer() {
   const smartAttackResultsHandler = (attackResults, coordinates) => {
     if (attackResults === 'hit') successfulAttacks.push(coordinates);
     if (attackResults === 'sunk') {
-      console.log('SUNK SHIP! Clearing stacks');
       clearAdjacentNextMovesStack();
       clearLastSuccessfulAttack();
       clearLinearNextMovesStack();
@@ -127,7 +134,11 @@ export function Computer() {
   // smart attack
   const smartAttack = (enemyBoardObj) => {
     // no hits recently
-    if (successfulAttacks.length === 0 && adjacentNextMoveStack.length === 0) {
+    if (
+      successfulAttacks.length === 0 &&
+      adjacentNextMoveStack.length === 0 &&
+      linearNextMovesStack.length === 0
+    ) {
       return randomAttack(enemyBoardObj);
     }
 
@@ -150,15 +161,11 @@ export function Computer() {
     // get next valid linear moves
     if (successfulAttacks.length > 1) {
       clearAdjacentNextMovesStack();
-      console.log('successful hits', successfulAttacks);
-      // add both direction nextvalid coord
       const startPos = successfulAttacks[0];
       const endPos = successfulAttacks[1];
-      console.log('hit 1', startPos, 'hit 2', endPos);
 
       const linearMoves = enemyBoardObj.getLinearNextMoves(startPos, endPos);
       linearMoves.forEach((move) => linearNextMovesStack.push(move));
-      console.log('next move stack:', linearNextMovesStack);
     }
 
     let coordinates;
@@ -166,7 +173,6 @@ export function Computer() {
     adjacentNextMoveStack.length > 0
       ? (coordinates = adjacentNextMoveStack.pop())
       : (coordinates = linearNextMovesStack.pop());
-    console.log('testing', coordinates);
 
     const attackResults = proto.attack(coordinates, enemyBoardObj);
     smartAttackResultsHandler(attackResults, coordinates);
