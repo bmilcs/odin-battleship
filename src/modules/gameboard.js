@@ -147,9 +147,9 @@ export default (boardSize = 10) => {
 
   const markAdjacentSunkCoordinatesAsMisses = () => {
     const allSunkCoordinates = [];
-    const allSurroundingCellsToBeUpdated = [];
-    for (let row = 0; row < boardSize - 1; row++) {
-      for (let col = 0; col < boardSize - 1; col++) {
+    const surroundingCells = [];
+    for (let row = 0; row < boardSize; row++) {
+      for (let col = 0; col < boardSize; col++) {
         if (boardArr[row][col].toString().includes('S'))
           allSunkCoordinates.push([row, col]);
       }
@@ -158,13 +158,11 @@ export default (boardSize = 10) => {
     allSunkCoordinates.forEach((coord) => {
       const adjacentCoordinates = getAllValidAdjacentCoordinates(coord);
       adjacentCoordinates.forEach((adjCoord) => {
-        allSurroundingCellsToBeUpdated.push(adjCoord);
+        surroundingCells.push(adjCoord);
       });
     });
 
-    allSurroundingCellsToBeUpdated.forEach((coordToAttack) =>
-      receiveAttack(coordToAttack)
-    );
+    surroundingCells.forEach((coordToAttack) => receiveAttack(coordToAttack));
   };
 
   //
@@ -225,7 +223,7 @@ export default (boardSize = 10) => {
     return linearNextMoves;
   };
 
-  const getAllValidAdjacentCoordinates = (coordinates, enemyBoardObj = '') => {
+  const getAllValidAdjacentCoordinates = (coordinates, boardObj = '') => {
     const [row, col] = coordinates;
 
     const allPossibleMoves = [];
@@ -235,9 +233,9 @@ export default (boardSize = 10) => {
     allPossibleMoves.push([row, col - 1]);
 
     const validNextMoves = allPossibleMoves.filter((coordinates) => {
-      return !enemyBoardObj
+      return !boardObj
         ? areUnplayedValidCoordinates(coordinates)
-        : enemyBoardObj.areUnplayedValidCoordinates(coordinates);
+        : boardObj.areUnplayedValidCoordinates(coordinates);
     });
 
     return validNextMoves;
