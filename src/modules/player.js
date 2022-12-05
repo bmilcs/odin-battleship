@@ -31,12 +31,12 @@ export function Player() {
   // * note: array.includes() doesn't work with nested arrays
   const isRepeatPlay = (coordinates) => {
     const [targetRow, targetCol] = coordinates;
-    const duplicateCoordinates = prevPlayedCoordinates.filter((coord) => {
+    const isARepeatPlay = prevPlayedCoordinates.some((coord) => {
       const [prevPlayedRow, prevPlayedCol] = coord;
       if (prevPlayedRow === targetRow && prevPlayedCol === targetCol)
         return true;
     });
-    return duplicateCoordinates.length === 0 ? false : true;
+    return isARepeatPlay;
   };
 
   return {
@@ -92,7 +92,7 @@ export function Computer() {
       randomCoordinates = generateRandomCoordinates(boardSize);
       if (proto.isRepeatPlay(randomCoordinates)) continue;
       // ignore squares with no adjacent openings (can't possibly be a ship)
-      const adjacentMoves = enemyBoardObj.getAllAdjectNextMoves(
+      const adjacentMoves = enemyBoardObj.getAllValidAdjacentCoordinates(
         randomCoordinates,
         enemyBoardObj
       );
@@ -150,7 +150,7 @@ export function Computer() {
       successfulAttacks.length === 1
     ) {
       const lastHit = successfulAttacks[successfulAttacks.length - 1];
-      const nextMoves = enemyBoardObj.getAllAdjectNextMoves(
+      const nextMoves = enemyBoardObj.getAllValidAdjacentCoordinates(
         lastHit,
         enemyBoardObj
       );

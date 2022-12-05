@@ -40,9 +40,17 @@ export default (boardSize = 10) => {
   };
 
   // returns true if ship can be placed between two coordinates
+  // ie: coordinates are within gameboard & coordinates are not sharing
+  // a common border with another ship
   const canPlaceShipBetween = (startPos, endPos) => {
     const allCoordinates = getAllCoordinatesBetween(startPos, endPos);
-    return allCoordinates.every((coord) => areEmptyValidCoordinates(coord));
+    return allCoordinates.every((coord) => {
+      const adjacentCoordinates = getAllValidAdjacentCoordinates(coord);
+      const touchingAnotherShip = adjacentCoordinates.some(
+        (adjCoord) => !areCoordinatesEmpty(adjCoord)
+      );
+      if (!touchingAnotherShip && areEmptyValidCoordinates(coord)) return true;
+    });
   };
 
   // calculate end coordinate, given a starting position, direction & ship size
@@ -194,7 +202,7 @@ export default (boardSize = 10) => {
     return linearNextMoves;
   };
 
-  const getAllAdjectNextMoves = (coordinates, enemyBoardObj) => {
+  const getAllValidAdjacentCoordinates = (coordinates, enemyBoardObj = '') => {
     const [row, col] = coordinates;
 
     const allPossibleMoves = [];
@@ -203,9 +211,11 @@ export default (boardSize = 10) => {
     allPossibleMoves.push([row, col + 1]);
     allPossibleMoves.push([row, col - 1]);
 
-    const validNextMoves = allPossibleMoves.filter((coordinates) =>
-      enemyBoardObj.areUnplayedValidCoordinates(coordinates)
-    );
+    const validNextMoves = allPossibleMoves.filter((coordinates) => {
+      return !enemyBoardObj
+        ? areUnplayedValidCoordinates(coordinates)
+        : enemyBoardObj.areUnplayedValidCoordinates(coordinates);
+    });
 
     return validNextMoves;
   };
@@ -260,7 +270,7 @@ export default (boardSize = 10) => {
     getArray,
     getAllCoordinatesBetween,
     getEndCoordinate,
-    getAllAdjectNextMoves,
+    getAllValidAdjacentCoordinates,
     getLinearNextMoves,
     areCoordinatesEmpty,
     areCoordinatesInsideBoard,
