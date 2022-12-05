@@ -117,9 +117,10 @@ export default (boardSize = 10) => {
       const shipID = currentValueOnBoard;
       const shipObj = shipsArr[shipID];
       shipObj.hit();
-      shipObj.isSunk()
-        ? sinkShipInGameboardArray(shipID)
-        : (boardArr[row][col] += 'X');
+      if (shipObj.isSunk()) {
+        sinkShipInGameboardArray(shipID);
+        markAdjacentSunkCoordinatesAsMisses();
+      } else boardArr[row][col] += 'X';
 
       if (areAllShipsSunk()) return 'game over';
 
@@ -143,6 +144,28 @@ export default (boardSize = 10) => {
   };
 
   const areAllShipsSunk = () => shipsArr.every((ship) => ship.isSunk());
+
+  const markAdjacentSunkCoordinatesAsMisses = () => {
+    const allSunkCoordinates = [];
+    const allSurroundingCellsToBeUpdated = [];
+    for (let row = 0; row < boardSize - 1; row++) {
+      for (let col = 0; col < boardSize - 1; col++) {
+        if (boardArr[row][col].toString().includes('S'))
+          allSunkCoordinates.push([row, col]);
+      }
+    }
+
+    allSunkCoordinates.forEach((coord) => {
+      const adjacentCoordinates = getAllValidAdjacentCoordinates(coord);
+      adjacentCoordinates.forEach((adjCoord) => {
+        allSurroundingCellsToBeUpdated.push(adjCoord);
+      });
+    });
+
+    allSurroundingCellsToBeUpdated.forEach((coordToAttack) =>
+      receiveAttack(coordToAttack)
+    );
+  };
 
   //
   // utility functions
@@ -278,6 +301,7 @@ export default (boardSize = 10) => {
     areUnplayedValidCoordinates,
     canPlaceShipBetween,
     placeShip,
+    markAdjacentSunkCoordinatesAsMisses,
     receiveAttack,
     areAllShipsSunk,
   };

@@ -22,7 +22,6 @@ const resetPlayerObjs = () => {
 };
 
 const startGamePlay = () => {
-  // ships are placed, user begins game
   DOM.renderGameModeLayout();
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 };
