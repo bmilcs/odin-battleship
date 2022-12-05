@@ -218,8 +218,15 @@ const renderPreGame = (player) => {
 
   containerize(
     main,
-    makeElement('h1', 'pregame-header', 'Pre-Game Setup'),
-    makeElement('p', 'ship-size-description', `Place ${shipSize}x Ship`),
+    containerize(
+      'pre-game-header-container',
+      makeElement('h1', 'pregame-header', 'Position Your Fleet'),
+      makeElement(
+        'p',
+        'ship-size-description',
+        `Place the ${shipSize}x ship on your gameboard.`
+      )
+    ),
     gameboard,
     startGameBtn
   );

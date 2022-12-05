@@ -4,6 +4,7 @@ import * as Player from './player';
 const start = () => {
   DOM.renderLayout();
   DOM.renderMainMenu();
+  // startPreGame();
 };
 
 let player;

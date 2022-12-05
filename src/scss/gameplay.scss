@@ -3,8 +3,22 @@
   gap: 1rem;
 }
 
+.enemy-container,
+.player-container {
+  padding: 0.75rem;
+  border-radius: var(--border-radius-100);
+  box-shadow: var(--box-shadow-900);
+  background: var(--clr-neutral-700);
+}
+// .enemy-container {
+//   background: var(--clr-accent-900);
+// }
+// .player-container {
+//   background: var(--clr-primary-800);
+// }
+
 .gameboard-container {
-  --gameboard-border: 2px solid var(--clr-neutral-300);
+  --gameboard-border: 3px solid var(--clr-neutral-300);
   border-right: var(--gameboard-border);
   border-bottom: var(--gameboard-border);
 
@@ -27,8 +41,12 @@
     border-left: var(--gameboard-border);
     border-top: var(--gameboard-border);
 
-    min-width: 5vw;
+    width: min(4vw, 4vh);
     aspect-ratio: 1/1;
+
+    &:not(.pre-game-cell):not(.hit):not(.sunk):not(.miss):hover {
+      background: var(--clr-primary-800);
+    }
 
     &.hit {
       background: var(--clr-accent-900);
@@ -51,19 +69,10 @@
     }
 
     &.place-hover-error {
-      background: var(--clr-primary-200);
+      background: var(--clr-accent-900);
     }
-
     &[class*='ship'] {
-      background: var(--clr-accent-100);
-
-      &.place-hover-valid {
-        background: var(--clr-neutral-200);
-      }
-
-      &.place-hover-error {
-        background: var(--clr-primary-200);
-      }
+      background: var(--clr-primary-800);
     }
   }
 }
