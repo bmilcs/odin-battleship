@@ -27,6 +27,36 @@ export function Player() {
     return gameboardObj.getArray();
   };
 
+  const generateRandomCoordinates = (boardSize) => {
+    const randomRow = randomInt(0, boardSize - 1);
+    const randomCol = randomInt(0, boardSize - 1);
+    return [randomRow, randomCol];
+  };
+
+  const randomInt = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+
+  // recursively place enemy ships on gameboard using a stack
+  const placeShipsRandomly = () => {
+    const shipSize = placeShipList.pop();
+    if (shipSize === undefined) return;
+
+    // const boardObj = boardObj();
+    const boardSize = gameboardObj.getArray().length;
+    let startPos, endPos, shipDirection, canPlaceShipHere;
+
+    while (!canPlaceShipHere) {
+      startPos = generateRandomCoordinates(boardSize);
+      shipDirection = randomInt(0, 1) === 0 ? 'vertical' : 'horizontal';
+      endPos = gameboardObj.getEndCoordinate(startPos, shipDirection, shipSize);
+      canPlaceShipHere = gameboardObj.canPlaceShipBetween(startPos, endPos);
+    }
+
+    gameboardObj.placeShip(startPos, endPos);
+    placeShipsRandomly();
+  };
+
   // check if a set of coordinates has been played already
   // * note: array.includes() doesn't work with nested arrays
   const isRepeatPlay = (coordinates) => {
@@ -43,7 +73,9 @@ export function Player() {
     attack,
     boardArr,
     boardObj,
+    placeShipsRandomly,
     isRepeatPlay,
+    generateRandomCoordinates,
     placeShipList,
   };
 }
@@ -52,26 +84,6 @@ export function Player() {
 
 export function Computer() {
   const proto = Player();
-
-  // recursively place enemy ships on gameboard using a stack
-  const placeShipsRandomly = () => {
-    const shipSize = proto.placeShipList.pop();
-    if (shipSize === undefined) return;
-
-    const boardObj = proto.boardObj();
-    const boardSize = proto.boardArr().length;
-    let startPos, endPos, shipDirection, canPlaceShipHere;
-
-    while (!canPlaceShipHere) {
-      startPos = generateRandomCoordinates(boardSize);
-      shipDirection = randomInt(0, 1) === 0 ? 'vertical' : 'horizontal';
-      endPos = boardObj.getEndCoordinate(startPos, shipDirection, shipSize);
-      canPlaceShipHere = boardObj.canPlaceShipBetween(startPos, endPos);
-    }
-
-    boardObj.placeShip(startPos, endPos);
-    placeShipsRandomly();
-  };
 
   //
   // attacking functions
@@ -89,7 +101,7 @@ export function Computer() {
 
     // prevent computer from making duplicate attacks
     while (true) {
-      randomCoordinates = generateRandomCoordinates(boardSize);
+      randomCoordinates = proto.generateRandomCoordinates(boardSize);
       if (proto.isRepeatPlay(randomCoordinates)) continue;
       // ignore squares with no adjacent openings (can't possibly be a ship)
       const adjacentMoves = enemyBoardObj.getAllValidAdjacentCoordinates(
@@ -179,15 +191,5 @@ export function Computer() {
     return attackResults;
   };
 
-  const generateRandomCoordinates = (boardSize) => {
-    const randomRow = randomInt(0, boardSize - 1);
-    const randomCol = randomInt(0, boardSize - 1);
-    return [randomRow, randomCol];
-  };
-
-  const randomInt = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  return { ...proto, randomAttack, smartAttack, placeShipsRandomly };
+  return { ...proto, randomAttack, smartAttack };
 }

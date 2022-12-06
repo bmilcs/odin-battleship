@@ -50,6 +50,9 @@
 
     &.hit {
       background: var(--clr-accent-900);
+      svg {
+        fill: var(--clr-neutral-100);
+      }
     }
 
     &.miss {
@@ -58,6 +61,12 @@
 
     &.sunk {
       background: var(--clr-neutral-700);
+
+      svg {
+        width: 75%;
+        height: 75%;
+        fill: var(--clr-neutral-100);
+      }
     }
 
     &.player-cell {

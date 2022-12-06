@@ -9,6 +9,8 @@ import '../scss/menu.scss';
 import githubSVG from '../assets/github.svg';
 import battleshipIconSVG from '../assets/battleship-icon.svg';
 import battleshipAction from '../assets/battleship-action.jpg';
+import battleshipHit from '../assets/battleship-hit.svg';
+import battleshipSunkSVG from '../assets/battleship-sunk.svg';
 
 //
 // page layout
@@ -210,6 +212,13 @@ const renderPreGame = (player) => {
   const startGameBtn = makeElement('button', 'start-game-btn', 'Start Game');
   startGameBtn.addEventListener('click', startGameHandler);
 
+  const placeShipsRandomlyBtn = makeElement(
+    'button',
+    'place-ships-auto',
+    'Randomly Place Ships'
+  );
+  placeShipsRandomlyBtn.addEventListener('click', placeShipsRandomlyHandler);
+
   const gameboard = prepBoard(boardArr, 'pre-game', placeShipClickHandler);
 
   gameboard.addEventListener('mouseover', placeShipMouseEnter);
@@ -228,6 +237,7 @@ const renderPreGame = (player) => {
       )
     ),
     gameboard,
+    placeShipsRandomlyBtn,
     startGameBtn
   );
 };
@@ -236,6 +246,10 @@ const renderPreGame = (player) => {
 const startGameHandler = (e) => {
   clearMain();
   APP.startGamePlay();
+};
+
+const placeShipsRandomlyHandler = () => {
+  APP.placeShipsRandomly();
 };
 
 // create gameboard from a player/computer gameboard array
@@ -261,9 +275,17 @@ const prepBoard = (boardArr, player, clickCallback) => {
       }
       // add styling for hit but not sunk: array value = ship.id & "X"
       // ie: array value of "1X" means: shipObj.id = 1, "X" = hit
-      if (cell.toString().includes('X')) cellDiv.classList.add('hit');
+      if (cell.toString().includes('X')) {
+        cellDiv.classList.add('hit');
+        cellDiv.innerHTML = battleshipHit;
+      }
       // add styling for sunk ship: "2S": ship.id 2, "S" = sunk
-      else if (cell.toString().includes('S')) cellDiv.classList.add('sunk');
+      else if (cell.toString().includes('S')) {
+        cellDiv.classList.add('sunk');
+        cellDiv.innerHTML = battleshipSunkSVG;
+
+        // cellDiv.innerHtml = battleshipSunkSVG;
+      }
       // add styling for misses: "M"
       else if (cell === 'M') cellDiv.classList.add('miss');
       return cellDiv;
@@ -355,8 +377,9 @@ const closeGameWinner = () => {
 
 const playAgainClickHandler = (e) => {
   closeGameWinner();
-  APP.startPreGame();
+  APP.playAgain();
 };
+
 const returnMainMenuHandler = (e) => {
   closeGameWinner();
   clearMain();

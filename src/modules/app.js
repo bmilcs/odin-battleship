@@ -4,6 +4,7 @@ import * as Player from './player';
 const start = () => {
   DOM.renderLayout();
   DOM.renderMainMenu();
+  resetPlayerObjs();
   // startPreGame();
 };
 
@@ -11,10 +12,14 @@ let player;
 let enemy;
 
 const startPreGame = () => {
-  resetPlayerObjs();
   DOM.renderPreGame(player);
   // placeShipsTest();
   enemy.placeShipsRandomly();
+};
+
+const playAgain = () => {
+  resetPlayerObjs();
+  startPreGame();
 };
 
 const resetPlayerObjs = () => {
@@ -25,6 +30,11 @@ const resetPlayerObjs = () => {
 const startGamePlay = () => {
   DOM.renderGameModeLayout();
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+};
+
+const placeShipsRandomly = () => {
+  player.placeShipsRandomly();
+  DOM.renderPreGame(player);
 };
 
 const placeShipsTest = () => {
@@ -71,4 +81,11 @@ const declareVictor = (victorName) => {
   DOM.renderGameWinner(victorName);
 };
 
-export { start, startPreGame, startGamePlay, playerAttack };
+export {
+  start,
+  startPreGame,
+  playAgain,
+  startGamePlay,
+  playerAttack,
+  placeShipsRandomly,
+};
