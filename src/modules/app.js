@@ -10,11 +10,18 @@ const start = () => {
 
 let player;
 let enemy;
+let turn;
 
 const startPreGame = () => {
   DOM.renderPreGame(player);
   // placeShipsTest();
-  enemy.placeShipsRandomly();
+  turn = 'player';
+};
+
+const placeShipsRandomly = () => {
+  resetPlayerObjs();
+  player.placeShipsRandomly();
+  DOM.renderPreGame(player);
 };
 
 const playAgain = () => {
@@ -25,16 +32,12 @@ const playAgain = () => {
 const resetPlayerObjs = () => {
   player = Player.Player();
   enemy = Player.Computer();
+  enemy.placeShipsRandomly();
 };
 
 const startGamePlay = () => {
   DOM.renderGameModeLayout();
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
-};
-
-const placeShipsRandomly = () => {
-  player.placeShipsRandomly();
-  DOM.renderPreGame(player);
 };
 
 const placeShipsTest = () => {
@@ -60,25 +63,41 @@ const playerAttack = (coordinates) => {
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
 
   if (attackResults === 'game over') declareVictor('Player');
-  else if (attackResults === 'miss') initiateEnemyAttack();
+  else if (attackResults === 'miss') {
+    DOM.renderEnemysTurn();
+    initiateEnemyAttack();
+  }
 };
 
 // recursively attack at random until a miss or victory occurs
 const initiateEnemyAttack = (attackResults) => {
-  if (attackResults === 'miss') return;
-  if (attackResults === 'game over') {
-    declareVictor('Computer');
-    return;
-  }
-  // DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
   setTimeout(() => {
-    initiateEnemyAttack(enemy.smartAttack(player.boardObj()));
+    turn = 'enemy';
+
+    if (attackResults === 'miss') {
+      turn = 'player';
+      DOM.renderPlayersTurn();
+      return;
+    }
+
+    if (attackResults === 'game over') {
+      declareVictor('Computer');
+      return;
+    }
     DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
-  }, 200);
+    setTimeout(() => {
+      initiateEnemyAttack(enemy.smartAttack(player.boardObj()));
+      DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+    }, 1500);
+  }, 750);
 };
 
 const declareVictor = (victorName) => {
   DOM.renderGameWinner(victorName);
+};
+
+const getTurn = () => {
+  return turn;
 };
 
 export {
@@ -88,4 +107,5 @@ export {
   startGamePlay,
   playerAttack,
   placeShipsRandomly,
+  getTurn,
 };

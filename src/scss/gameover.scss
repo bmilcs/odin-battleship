@@ -1,6 +1,10 @@
 @import 'index.scss';
 
 .game-over-modal {
+  z-index: 2;
+
+  transition: var(--transition-900);
+
   // center modal in viewport
   position: absolute;
   text-align: center;

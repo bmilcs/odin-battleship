@@ -127,12 +127,6 @@ const renderPreGame = (player) => {
   const shipSize = player.placeShipList.pop();
   let shipDirection = 'vertical';
 
-  if (shipSize === undefined) {
-    clearMain();
-    APP.startGamePlay();
-    return;
-  }
-
   // click: place ship at given coordinate
   const placeShipClickHandler = (e) => {
     const coordinatesAttr = e.target.getAttribute('coordinates');
@@ -219,22 +213,31 @@ const renderPreGame = (player) => {
   );
   placeShipsRandomlyBtn.addEventListener('click', placeShipsRandomlyHandler);
 
-  const gameboard = prepBoard(boardArr, 'pre-game', placeShipClickHandler);
+  let gameboard;
 
-  gameboard.addEventListener('mouseover', placeShipMouseEnter);
-  gameboard.addEventListener('mouseout', placeShipMouseLeave);
-  gameboard.addEventListener('contextmenu', rotateDirectionHandler);
+  // if ships still need to be placed down
+  if (shipSize !== undefined) {
+    gameboard = prepBoard(boardArr, 'pre-game', placeShipClickHandler);
+    gameboard.addEventListener('mouseover', placeShipMouseEnter);
+    gameboard.addEventListener('mouseout', placeShipMouseLeave);
+    gameboard.addEventListener('contextmenu', rotateDirectionHandler);
+  } else {
+    // render gameboard without hover/click effects
+    gameboard = prepBoard(boardArr, 'pre-game');
+  }
+
+  let shipDescription;
+
+  shipSize
+    ? (shipDescription = `Place the ${shipSize}x ship on your gameboard.`)
+    : (shipDescription = `Click on Start Game to begin!`);
 
   containerize(
     main,
     containerize(
       'pre-game-header-container',
       makeElement('h1', 'pregame-header', 'Position Your Fleet'),
-      makeElement(
-        'p',
-        'ship-size-description',
-        `Place the ${shipSize}x ship on your gameboard.`
-      )
+      makeElement('p', 'ship-size-description', shipDescription)
     ),
     gameboard,
     placeShipsRandomlyBtn,
@@ -270,7 +273,7 @@ const prepBoard = (boardArr, player, clickCallback) => {
       // attribute: coordinates that align with the gameboard Array
       cellDiv.setAttribute('coordinates', `${y}-${x}`);
       // pregame mode: add styling so player can see where ships are placed
-      if (player === 'pre-game') {
+      if (player === 'pre-game' || player === 'player') {
         if (typeof cell === 'number') cellDiv.classList.add(`ship-${cell}`);
       }
       // add styling for hit but not sunk: array value = ship.id & "X"
@@ -283,8 +286,6 @@ const prepBoard = (boardArr, player, clickCallback) => {
       else if (cell.toString().includes('S')) {
         cellDiv.classList.add('sunk');
         cellDiv.innerHTML = battleshipSunkSVG;
-
-        // cellDiv.innerHtml = battleshipSunkSVG;
       }
       // add styling for misses: "M"
       else if (cell === 'M') cellDiv.classList.add('miss');
@@ -333,10 +334,21 @@ const renderGameboardChanges = (enemyBoardArr, playerBoardArr) => {
 };
 
 const attackClickHandler = (e) => {
+  if (APP.getTurn() === 'enemy') return;
   const coordinatesAttr = e.target.getAttribute('coordinates');
   if (coordinatesAttr === null) return;
   const coordinates = parseCoordinatesAttr(coordinatesAttr);
   APP.playerAttack(coordinates);
+};
+
+const renderPlayersTurn = () => {
+  enemyContainer.classList.add('active');
+  playerContainer.classList.remove('active');
+};
+
+const renderEnemysTurn = () => {
+  enemyContainer.classList.remove('active');
+  playerContainer.classList.add('active');
 };
 
 //
@@ -354,16 +366,25 @@ const renderGameWinner = (victorName) => {
   );
   returnMainMenuBtn.addEventListener('click', returnMainMenuHandler);
 
+  let header;
+  let p;
+
+  if (victorName === 'Player') {
+    header = 'YOU WIN!';
+    p =
+      'Congratulations! You have crushed your opponent. Would you like to play another round?';
+  } else {
+    header = 'YOU LOSE!';
+    p =
+      'Robots have destroyed your fleet. Dare to challenge them to another round?';
+  }
+
   containerize(
     document.querySelector('body'),
     containerize(
       gameOverModal,
-      makeElement('h2', 'gameover-header', `${victorName} is the winner!`),
-      makeElement(
-        'p',
-        'gameover-instructions',
-        'Congratulations! You have crushed your opponent. Would you like to play another round?'
-      ),
+      makeElement('h2', 'gameover-header', header),
+      makeElement('p', 'gameover-instructions', p),
       playAgainBtn,
       returnMainMenuBtn
     )
@@ -393,4 +414,6 @@ export {
   renderGameModeLayout,
   renderGameboardChanges,
   renderGameWinner,
+  renderPlayersTurn,
+  renderEnemysTurn,
 };
