@@ -88,7 +88,7 @@ const initiateEnemyAttack = (attackResults) => {
     setTimeout(() => {
       initiateEnemyAttack(enemy.smartAttack(player.boardObj()));
       DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
-    }, 1500);
+    }, 500);
   }, 750);
 };
 

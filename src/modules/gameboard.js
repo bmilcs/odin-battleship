@@ -49,7 +49,16 @@ export default (boardSize = 10) => {
       const touchingAnotherShip = adjacentCoordinates.some(
         (adjCoord) => !areCoordinatesEmpty(adjCoord)
       );
-      if (!touchingAnotherShip && areEmptyValidCoordinates(coord)) return true;
+      const diagonalCoordinates = getDiagonalCoordinates(coord);
+      const diagonalCoordinatesAreClear = diagonalCoordinates.every(
+        (diagCoord) => areEmptyValidCoordinates(diagCoord)
+      );
+      if (
+        !touchingAnotherShip &&
+        diagonalCoordinatesAreClear &&
+        areEmptyValidCoordinates(coord)
+      )
+        return true;
     });
   };
 
@@ -160,6 +169,11 @@ export default (boardSize = 10) => {
       adjacentCoordinates.forEach((adjCoord) => {
         surroundingCells.push(adjCoord);
       });
+      const diagonalCoordinates = getDiagonalCoordinates(coord);
+      diagonalCoordinates.forEach((diagCoord) => {
+        if (areCoordinatesInsideBoard(diagCoord))
+          surroundingCells.push(diagCoord);
+      });
     });
 
     surroundingCells.forEach((coordToAttack) => receiveAttack(coordToAttack));
@@ -239,6 +253,21 @@ export default (boardSize = 10) => {
     });
 
     return validNextMoves;
+  };
+
+  const getDiagonalCoordinates = (coordinates) => {
+    const cornerCoordinates = [];
+    const [row, col] = coordinates;
+
+    cornerCoordinates.push([row - 1, col - 1]);
+    cornerCoordinates.push([row - 1, col + 1]);
+    cornerCoordinates.push([row + 1, col - 1]);
+    cornerCoordinates.push([row + 1, col + 1]);
+
+    return cornerCoordinates.filter((coord) => {
+      if (!areCoordinatesInsideBoard(coord)) return false;
+      return true;
+    });
   };
 
   const getAllCoordinatesBetween = (startPos, endPos) => {
