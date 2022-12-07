@@ -16,6 +16,7 @@
   --clr-neutral-200: #e2e2e2;
   --clr-neutral-300: #bdbdbd;
   --clr-neutral-700: #757575;
+  --clr-neutral-800: #272727;
   --clr-neutral-900: #212121;
   --clr-accent-100: #3bcf3b;
   --clr-accent-900: #c34a4a;
@@ -92,6 +93,7 @@ main {
 
 button {
   padding: 1rem 2rem;
+  margin-inline: 0.25rem;
 
   border-radius: var(--border-radius-100);
   outline: none;
@@ -109,6 +111,8 @@ button {
 
   &:hover,
   &:focus {
+    background: var(--clr-neutral-800);
+    color: var(--clr-neutral-100);
     box-shadow: var(--box-shadow-900);
   }
   &:active {

@@ -38,6 +38,7 @@ const resetPlayerObjs = () => {
 const startGamePlay = () => {
   DOM.renderGameModeLayout();
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+  DOM.renderPlayersTurn();
 };
 
 const placeShipsTest = () => {
@@ -89,7 +90,7 @@ const initiateEnemyAttack = (attackResults) => {
       initiateEnemyAttack(enemy.smartAttack(player.boardObj()));
       DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
     }, 500);
-  }, 750);
+  }, 1000);
 };
 
 const declareVictor = (victorName) => {

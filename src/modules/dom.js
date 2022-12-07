@@ -213,9 +213,17 @@ const renderPreGame = (player) => {
   const placeShipsRandomlyBtn = makeElement(
     'button',
     'place-ships-auto',
-    'Randomly Place Ships'
+    'Auto'
   );
   placeShipsRandomlyBtn.addEventListener('click', placeShipsRandomlyHandler);
+
+  const resetShipPlacementBtn = makeElement(
+    'button',
+    'reset-ship-placement-btn',
+    'Reset'
+  );
+
+  resetShipPlacementBtn.addEventListener('click', resetShipPlacementHandler);
 
   let gameboard;
 
@@ -244,8 +252,12 @@ const renderPreGame = (player) => {
       makeElement('p', 'ship-size-description', shipDescription)
     ),
     gameboard,
-    placeShipsRandomlyBtn,
-    startGameBtn
+    containerize(
+      'pre-game-button-container',
+      placeShipsRandomlyBtn,
+      startGameBtn,
+      resetShipPlacementBtn
+    )
   );
 };
 
@@ -257,6 +269,11 @@ const startGameHandler = (e) => {
 
 const placeShipsRandomlyHandler = () => {
   APP.placeShipsRandomly();
+};
+
+const resetShipPlacementHandler = (e) => {
+  APP.resetPlayerObjs();
+  APP.startPreGame();
 };
 
 // create gameboard from a player/computer gameboard array
@@ -328,16 +345,26 @@ const renderGameModeLayout = () => {
 };
 
 const renderGameboardChanges = (enemyBoardArr, playerBoardArr) => {
-  clearChildren(playerContainer);
+  renderEnemyBoardContainer(enemyBoardArr);
+  renderPlayerBoardContainer(playerBoardArr);
+};
+
+const renderEnemyBoardContainer = (enemyBoardArr) => {
   clearChildren(enemyContainer);
   const enemyBoardElements = prepBoard(
     enemyBoardArr,
     'enemy',
     attackClickHandler
   );
+  const h2 = makeElement('h2', 'gameboard-header', 'Fire away!');
+  containerize(enemyContainer, h2, enemyBoardElements);
+};
+
+const renderPlayerBoardContainer = (playerBoardArr) => {
+  clearChildren(playerContainer);
   const playerBoardElements = prepBoard(playerBoardArr, 'player');
-  enemyContainer.appendChild(enemyBoardElements);
-  playerContainer.appendChild(playerBoardElements);
+  const h2 = makeElement('h2', 'gameboard-header', 'Brace Yourself!');
+  containerize(playerContainer, h2, playerBoardElements);
 };
 
 const attackClickHandler = (e) => {

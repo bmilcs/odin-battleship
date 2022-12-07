@@ -16,7 +16,20 @@
   padding: 2rem;
 
   border-radius: var(--border-radius-900);
-  box-shadow: var(--box-shadow-100);
+  box-shadow: var(--box-shadow-900);
+
+  h2 {
+    font-size: 4rem;
+    font-family: var(--ff-title);
+    font-weight: 400;
+  }
+
+  p {
+    max-width: 40ch;
+    font-size: 1.15rem;
+    line-height: 1.7;
+    padding-bottom: 1rem;
+  }
 
   :nth-child(n) {
     margin: 0.5rem;
