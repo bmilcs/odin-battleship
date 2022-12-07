@@ -18,7 +18,10 @@
   --clr-neutral-700: #757575;
   --clr-neutral-800: #272727;
   --clr-neutral-900: #212121;
-  --clr-accent-100: #3bcf3b;
+  --clr-accent-100: #00cae4;
+  --clr-accent-200: #def5f4;
+  --clr-accent-300: #f9f871;
+  --clr-accent-800: #f65d91;
   --clr-accent-900: #c34a4a;
   --clr-primary-100: #e4e6f1;
   --clr-primary-200: #c5cae9;
@@ -47,10 +50,11 @@ body {
 
 header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 0.5rem;
 
-  padding: 1rem;
+  padding: 0.65rem;
 
   background: var(--clr-primary-800);
   color: var(--clr-neutral-100);
@@ -63,12 +67,12 @@ header {
   .header-title {
     font-family: var(--ff-title);
     font-weight: 400;
-    font-size: 2rem;
+    font-size: 2.5rem;
     letter-spacing: 1px;
   }
 
   .header-logo {
-    width: 3rem;
+    width: 2.75rem;
   }
 }
 

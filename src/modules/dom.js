@@ -34,7 +34,6 @@ const main = makeElement('main');
 const prepHeader = () => {
   return containerize(
     makeElement('header'),
-    makeElement('h3', 'header-title', 'Battleship'),
     makeElement(
       'div',
       'header-logo',
@@ -42,7 +41,8 @@ const prepHeader = () => {
       '',
       '',
       battleshipIconSVG
-    )
+    ),
+    makeElement('h3', 'header-title', 'Battleship')
   );
 };
 
@@ -242,7 +242,9 @@ const renderPreGame = (player) => {
 
   shipSize
     ? (shipDescription = `Place the ${shipSize}x ship on your gameboard. Right click rotates your ship.`)
-    : (shipDescription = `Click on Start Game to begin!`);
+    : (shipDescription = `Click on Start Game to begin! To start over, click the Reset button.`);
+
+  const pregameBoardContainer = makeElement('div', 'pre-game-board-container');
 
   containerize(
     main,
@@ -251,7 +253,7 @@ const renderPreGame = (player) => {
       makeElement('h1', 'pregame-header', 'Position Your Fleet'),
       makeElement('p', 'ship-size-description', shipDescription)
     ),
-    gameboard,
+    containerize(pregameBoardContainer, gameboard),
     containerize(
       'pre-game-button-container',
       placeShipsRandomlyBtn,

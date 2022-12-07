@@ -18,20 +18,26 @@
   }
 }
 
+.pre-game-board-container {
+  padding: 1rem;
+  background: var(--clr-primary-800);
+  border-radius: var(--border-radius-100);
+}
+
 .enemy-container,
 .player-container {
   padding: 1.25rem;
   border-radius: var(--border-radius-100);
   box-shadow: var(--box-shadow-900);
-  // background: var(--clr-primary-200);
 
   transition: var(--transition-900);
   opacity: 0;
 
   .gameboard-header {
-    color: var(--clr-primary-100);
-    padding-bottom: 0.5rem;
-    font-size: 2rem;
+    color: var(--clr-accent-300);
+    letter-spacing: 3px;
+    padding-bottom: 1rem;
+    font-size: 2.25rem;
     text-transform: uppercase;
     font-family: var(--ff-title);
     font-weight: normal;
