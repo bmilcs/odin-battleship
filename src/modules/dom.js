@@ -204,6 +204,23 @@ const renderPreGame = (player) => {
     displayHoverEffect(coordinatesAttr);
   };
 
+  // start game button functionality
+  const startGameHandler = () => {
+    if (shipSize === undefined) {
+      clearMain();
+      APP.startGamePlay();
+    }
+  };
+
+  const placeShipsRandomlyHandler = () => {
+    APP.placeShipsRandomly();
+  };
+
+  const resetShipPlacementHandler = () => {
+    APP.resetPlayerObjs();
+    APP.startPreGame();
+  };
+
   // render elements & apply above eventhandlers
   clearChildren(main);
 
@@ -261,21 +278,6 @@ const renderPreGame = (player) => {
       resetShipPlacementBtn
     )
   );
-};
-
-// start game button functionality
-const startGameHandler = (e) => {
-  clearMain();
-  APP.startGamePlay();
-};
-
-const placeShipsRandomlyHandler = () => {
-  APP.placeShipsRandomly();
-};
-
-const resetShipPlacementHandler = (e) => {
-  APP.resetPlayerObjs();
-  APP.startPreGame();
 };
 
 // create gameboard from a player/computer gameboard array

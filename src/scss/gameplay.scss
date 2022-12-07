@@ -19,7 +19,7 @@
 }
 
 .pre-game-board-container {
-  padding: 1rem;
+  padding: 1.25rem;
   background: var(--clr-primary-800);
   border-radius: var(--border-radius-100);
 }
@@ -61,7 +61,7 @@
 }
 
 .gameboard-container {
-  --gameboard-border: 3px solid var(--clr-neutral-100);
+  --gameboard-border: 2px solid var(--clr-neutral-100);
   border-right: var(--gameboard-border);
   border-bottom: var(--gameboard-border);
 
