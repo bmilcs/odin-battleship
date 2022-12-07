@@ -11,6 +11,7 @@ import battleshipIconSVG from '../assets/battleship-icon.svg';
 import battleshipAction from '../assets/battleship-action.jpg';
 import battleshipHit from '../assets/battleship-hit.svg';
 import battleshipSunkSVG from '../assets/battleship-sunk.svg';
+import battleshipBoard from '../assets/battleship-board.svg';
 
 //
 // page layout
@@ -102,7 +103,10 @@ const prepMainLogo = () => {
   );
 };
 
-const startPreGameHandler = () => APP.startPreGame();
+const startPreGameHandler = () => {
+  APP.resetPlayerObjs();
+  APP.startPreGame();
+};
 
 //
 // pre-game: ship placement
@@ -272,9 +276,12 @@ const prepBoard = (boardArr, player, clickCallback) => {
       const cellDiv = makeElement('div', `gameboard-cell ${player}-cell`);
       // attribute: coordinates that align with the gameboard Array
       cellDiv.setAttribute('coordinates', `${y}-${x}`);
-      // pregame mode: add styling so player can see where ships are placed
+      // add styling so player can see where ships are placed
       if (player === 'pre-game' || player === 'player') {
-        if (typeof cell === 'number') cellDiv.classList.add(`ship-${cell}`);
+        if (typeof cell === 'number') {
+          cellDiv.classList.add(`ship-${cell}`);
+          cellDiv.innerHTML = battleshipBoard;
+        }
       }
       // add styling for hit but not sunk: array value = ship.id & "X"
       // ie: array value of "1X" means: shipObj.id = 1, "X" = hit

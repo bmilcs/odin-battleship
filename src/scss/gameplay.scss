@@ -1,3 +1,5 @@
+@import './index.scss';
+
 .gameplay-container {
   display: flex;
   gap: 1rem;
@@ -6,17 +8,18 @@
 .enemy-container,
 .player-container {
   padding: 0.75rem;
-  border-radius: var(--border-radius-100);
+  // border-radius: var(--border-radius-100);
   box-shadow: var(--box-shadow-900);
-  background: var(--clr-neutral-300);
+  background: var(--clr-primary-200);
 
   transition: var(--transition-900);
   opacity: 0.75;
 
   &.active {
+    position: absolute;
     z-index: 1;
     opacity: 1;
-    scale: 1.25;
+    scale: 1.5;
     background: var(--clr-primary-800);
   }
 }
@@ -28,12 +31,12 @@
 // }
 
 .gameboard-container {
-  --gameboard-border: 3px solid var(--clr-neutral-300);
+  --gameboard-border: 3px solid var(--clr-neutral-100);
   border-right: var(--gameboard-border);
   border-bottom: var(--gameboard-border);
 
   box-shadow: var(--box-shadow-100);
-  background: var(--clr-neutral-100);
+  background: var(--clr-primary-200);
 
   .gameboard-row {
     display: flex;
@@ -54,10 +57,10 @@
     width: min(4vw, 4vh);
     aspect-ratio: 1/1;
 
-    transition: var(--transition-100);
-
-    &:not(.pre-game-cell):not(.hit):not(.sunk):not(.miss):hover {
-      background: var(--clr-primary-800);
+    &:not(.pre-game-cell):not(.player-cell):not(.hit):not(.sunk):not(
+        .miss
+      ):hover {
+      background: var(--clr-accent-100);
     }
 
     &.hit {
@@ -68,11 +71,11 @@
     }
 
     &.miss {
-      background: var(--clr-neutral-700);
+      background: var(--clr-primary-900);
     }
 
     &.sunk {
-      background: var(--clr-neutral-900);
+      background: var(--clr-primary-900);
 
       svg {
         width: 75%;
@@ -86,14 +89,19 @@
     }
 
     &.place-hover-valid {
-      background: var(--clr-neutral-200);
+      background: var(--clr-accent-100);
     }
 
     &.place-hover-error {
       background: var(--clr-accent-900);
     }
     &[class*='ship'] {
-      background: var(--clr-primary-800);
+      fill: var(--clr-primary-900);
+
+      svg {
+        width: 70%;
+        height: 70%;
+      }
     }
   }
 }

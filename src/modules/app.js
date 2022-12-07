@@ -103,6 +103,7 @@ const getTurn = () => {
 export {
   start,
   startPreGame,
+  resetPlayerObjs,
   playAgain,
   startGamePlay,
   playerAttack,
