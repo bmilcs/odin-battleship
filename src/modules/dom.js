@@ -241,7 +241,7 @@ const renderPreGame = (player) => {
   let shipDescription;
 
   shipSize
-    ? (shipDescription = `Place the ${shipSize}x ship on your gameboard.`)
+    ? (shipDescription = `Place the ${shipSize}x ship on your gameboard. Right click rotates your ship.`)
     : (shipDescription = `Click on Start Game to begin!`);
 
   containerize(
