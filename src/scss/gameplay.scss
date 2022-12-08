@@ -24,6 +24,11 @@
   border-radius: var(--border-radius-100);
 }
 
+.pre-game-button-container {
+  display: grid;
+  grid-template-rows: repeat(auto-fit, minmax(min-content, 1fr));
+}
+
 .enemy-container,
 .player-container {
   padding: 1.25rem;
@@ -32,6 +37,7 @@
 
   transition: var(--transition-900);
   opacity: 0;
+  scale: 0.5;
 
   .gameboard-header {
     color: var(--clr-accent-300);
@@ -46,9 +52,12 @@
 
   &.active {
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 1;
     opacity: 1;
-    scale: 1.5;
+    scale: 1;
   }
 }
 
@@ -84,7 +93,7 @@
     border-left: var(--gameboard-border);
     border-top: var(--gameboard-border);
 
-    width: min(4vw, 4vh);
+    width: min(6vw, 6vh);
     aspect-ratio: 1/1;
 
     &:not(.pre-game-cell):not(.player-cell):not(.hit):not(.sunk):not(.miss) {
