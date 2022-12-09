@@ -46,7 +46,7 @@ const prepHeader = () => {
   );
 };
 
-// create <footer> & append <a> <div> <p> </a> to it
+// create <footer> & append <a><div><p></a> to it
 const prepFooter = () => {
   return containerize(
     makeElement('footer'),
@@ -57,6 +57,10 @@ const prepFooter = () => {
     )
   );
 };
+
+//
+// utility functions
+//
 
 // remove all child elements from a parent element
 const clearChildren = (element) => {
@@ -76,19 +80,20 @@ const renderMainMenu = () => {
   const startPreGameBtn = makeElement('button', 'start-btn', 'Start Game');
   startPreGameBtn.addEventListener('click', startPreGameHandler);
 
-  containerize(
-    main,
-    containerize(
-      'main-menu-card',
-      prepMainLogo(),
-      makeElement(
-        'p',
-        'instructions',
-        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum impedit necessitatibus distinctio corrupti porro fugiat, odit vitae soluta itaque consequuntur at sed eveniet pariatur explicabo consectetur incidunt! Maxime ullam ipsa, laudantium possimus perspiciatis omnis pariatur velit odio eveniet sint repellendus minus, tenetur expedita dolores delectus eos doloribus saepe illo impedit?'
-      ),
-      startPreGameBtn
-    )
+  // create <div class='main-menu-card'> and append <p> & <button> to it
+  const mainMenuCard = containerize(
+    'main-menu-card',
+    prepMainLogo(),
+    makeElement(
+      'p',
+      'instructions',
+      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum impedit necessitatibus distinctio corrupti porro fugiat, odit vitae soluta itaque consequuntur at sed eveniet pariatur explicabo consectetur incidunt! Maxime ullam ipsa, laudantium possimus perspiciatis omnis pariatur velit odio eveniet sint repellendus minus, tenetur expedita dolores delectus eos doloribus saepe illo impedit?'
+    ),
+    startPreGameBtn
   );
+
+  // append assembled main menu to <main>
+  containerize(main, mainMenuCard);
 };
 
 const prepMainLogo = () => {
@@ -112,22 +117,23 @@ const startPreGameHandler = () => {
 // pre-game: ship placement
 //
 
-// containers for gameboards: stored globally to reduce dom calls
-const playerContainer = makeElement('div', 'player-container');
-const enemyContainer = makeElement('div', 'enemy-container');
-
 // convert html attribute to coordinate array: required by rest of app
+// ie: '5-1' to [5, 1]
 const parseCoordinatesAttr = (coordinatesAttr) => {
   return coordinatesAttr.split('-').map((str) => +str);
 };
 
-// render's player's board & add ship placement functionality
+// containers for gameboards: stored globally to reduce dom calls
+const playerContainer = makeElement('div', 'player-container');
+const enemyContainer = makeElement('div', 'enemy-container');
+
+// render pregame ship placement mode:
+// renders player's gameboard & allows for manual & automatic ship placement
 const renderPreGame = (player) => {
   const boardArr = player.boardArr();
   const boardObj = player.boardObj();
 
-  // renderPreGame() is called recursively,
-  // placeShipSize starts at 5, and decrements down to 2
+  // renderPreGame() is called recursively: placeShipList = [5, 4, 3, 3, 2]
   const shipSize = player.placeShipList.pop();
   let shipDirection = 'vertical';
 
@@ -142,7 +148,7 @@ const renderPreGame = (player) => {
 
     if (shipCanBePlacedHere) {
       boardObj.placeShip(startPos, endPos);
-      player.placeShipCounter--;
+      // recursively call renderPreGame() w/ newly placed ship
       renderPreGame(player);
     }
   };
@@ -161,7 +167,7 @@ const renderPreGame = (player) => {
     const allCoordinates = boardObj.getAllCoordinatesBetween(startPos, endPos);
     const shipCanBePlacedHere = boardObj.canPlaceShipBetween(startPos, endPos);
 
-    // add styling to a cell based on whether or not its position is
+    // add styling to a cell based on whether or not its ship coordinates are
     // empty & within the boundaries of the gameboard
     allCoordinates.forEach((coord) => {
       if (boardObj.areCoordinatesInsideBoard(coord)) {
@@ -187,12 +193,12 @@ const renderPreGame = (player) => {
     }
   };
 
-  // on hover leaving a cell
-  const placeShipMouseLeave = (e) => {
+  // on mouse hover leaving a cell
+  const placeShipMouseLeave = () => {
     clearAllHoverEffects();
   };
 
-  // rotate ship event
+  // rotate ship event: occurs on right click
   const rotateDirectionHandler = (e) => {
     e.preventDefault();
     const coordinatesAttr = e.target.getAttribute('coordinates');
@@ -206,13 +212,14 @@ const renderPreGame = (player) => {
 
   // start game button functionality
   const startGameHandler = () => {
-    if (shipSize === undefined) {
-      clearMain();
-      APP.startGamePlay();
-    }
+    // prevent starting the game until all ships are placed
+    // shipSize becomes undefined when the last ship is placed: placeShipList.pop()
+    if (shipSize !== undefined) return;
+    clearMain();
+    APP.startGamePlay();
   };
 
-  const placeShipsRandomlyHandler = () => {
+  const placeShipsAutomaticallyHandler = () => {
     APP.placeShipsRandomly();
   };
 
@@ -227,53 +234,54 @@ const renderPreGame = (player) => {
   const startGameBtn = makeElement('button', 'start-game-btn', 'Start Game');
   startGameBtn.addEventListener('click', startGameHandler);
 
-  const placeShipsRandomlyBtn = makeElement(
+  const placeShipsAutomaticallyBtn = makeElement(
     'button',
     'place-ships-auto',
     'Auto'
   );
-  placeShipsRandomlyBtn.addEventListener('click', placeShipsRandomlyHandler);
+  placeShipsAutomaticallyBtn.addEventListener(
+    'click',
+    placeShipsAutomaticallyHandler
+  );
 
   const resetShipPlacementBtn = makeElement(
     'button',
     'reset-ship-placement-btn',
     'Reset'
   );
-
   resetShipPlacementBtn.addEventListener('click', resetShipPlacementHandler);
 
   let gameboard;
 
-  // if ships still need to be placed down
+  // if ships still need to be placed down, add all event handlers to the gameboard
   if (shipSize !== undefined) {
     gameboard = prepBoard(boardArr, 'pre-game', placeShipClickHandler);
     gameboard.addEventListener('mouseover', placeShipMouseEnter);
     gameboard.addEventListener('mouseout', placeShipMouseLeave);
     gameboard.addEventListener('contextmenu', rotateDirectionHandler);
   } else {
-    // render gameboard without hover/click effects
+    // otherwise, render gameboard without hover/click effects
     gameboard = prepBoard(boardArr, 'pre-game');
   }
 
-  let shipDescription;
+  let preGameInstructions;
 
   shipSize
-    ? (shipDescription = `Place the ${shipSize}x ship on your gameboard. Note: Right click rotates your ship.`)
-    : (shipDescription = `Click on Start Game to begin! To start over, click the Reset button.`);
+    ? (preGameInstructions = `Place the ${shipSize}x ship on your gameboard. Note: Right click rotates your ship.`)
+    : (preGameInstructions = `Click on Start Game to begin! To start over, click the Reset button.`);
 
-  const pregameBoardContainer = makeElement('div', 'pre-game-board-container');
-
+  // append the above content to the <main> element
   containerize(
     main,
     containerize(
       'pre-game-header-container',
       makeElement('h1', 'pregame-header', 'Position Your Fleet'),
-      makeElement('p', 'ship-size-description', shipDescription)
+      makeElement('p', 'pregame-instructions', preGameInstructions)
     ),
-    containerize(pregameBoardContainer, gameboard),
+    containerize('pre-game-board-container', gameboard),
     containerize(
       'pre-game-button-container',
-      placeShipsRandomlyBtn,
+      placeShipsAutomaticallyBtn,
       startGameBtn,
       resetShipPlacementBtn
     )
@@ -281,65 +289,81 @@ const renderPreGame = (player) => {
 };
 
 // create gameboard from a player/computer gameboard array
-// and add a click event handler:
-//    boardArr: [
-//           row: [
-//                  cell, cell
-//                ], ...
+// and add a click event handler
 
-const prepBoard = (boardArr, player, clickCallback) => {
+const prepBoard = (boardArr, playerNameOrMode, clickCallback) => {
+  // boardArr [
+  //          row #1 [ cell, cell, cell... ]
+  //          row #2 [ cell, cell, cell... ]
+
   // map row arrays to row div containers
-  const assembledRowDivs = boardArr.map((row, y) => {
-    const rowDiv = makeElement('div', `gameboard-row ${player}-row`);
+  const assembledRowDivsArr = boardArr.map((row, y) => {
+    const rowDiv = makeElement('div', `gameboard-row ${playerNameOrMode}-row`);
 
-    // map each cell to its own div
-    const cellDivs = row.map((cell, x) => {
-      const cellDiv = makeElement('div', `gameboard-cell ${player}-cell`);
-      // attribute: coordinates that align with the gameboard Array
+    // within each row array, map each cell to its own div
+    const cellDivsArr = row.map((cellValue, x) => {
+      const cellDiv = makeElement(
+        'div',
+        `gameboard-cell ${playerNameOrMode}-cell`
+      );
+
+      // add an attribute that corresponds to its position within the gameboard Array
       cellDiv.setAttribute('coordinates', `${y}-${x}`);
-      // add styling so player can see where ships are placed
-      if (player === 'pre-game' || player === 'player') {
-        if (typeof cell === 'number') {
-          cellDiv.classList.add(`ship-${cell}`);
+
+      // add styling so player can see where their ships are placed
+      if (playerNameOrMode === 'pre-game' || playerNameOrMode === 'player') {
+        // pure number types in a gameboard array indicate that an unhit ship exists in this cell
+        // the # value is the shipObj.id
+        if (typeof cellValue === 'number') {
+          cellDiv.classList.add(`ship-${cellValue}`);
           cellDiv.innerHTML = battleshipBoard;
         }
       }
-      // add styling for hit but not sunk: array value = ship.id & "X"
-      // ie: array value of "1X" means: shipObj.id = 1, "X" = hit
-      if (cell.toString().includes('X')) {
+
+      // add styling for hit but not sunk ship
+      // ie: array value of "1X": shipObj.id = 1, "X" = hit
+      if (cellValue.toString().includes('X')) {
         cellDiv.classList.add('hit');
         cellDiv.innerHTML = battleshipHit;
       }
-      // add styling for sunk ship: "2S": ship.id 2, "S" = sunk
-      else if (cell.toString().includes('S')) {
+
+      // add styling for sunk ship:
+      // ie: array value of "2S": ship.id = 2, "S" = sunk
+      else if (cellValue.toString().includes('S')) {
         cellDiv.classList.add('sunk');
         cellDiv.innerHTML = battleshipSunkSVG;
       }
-      // add styling for misses: "M"
-      else if (cell === 'M') cellDiv.classList.add('miss');
+
+      // add styling for missed attacks: "M"
+      else if (cellValue === 'M') cellDiv.classList.add('miss');
+
+      // return cellDiv to its parent row array
       return cellDiv;
     });
 
-    // append all cells to parent rowDiv
-    return containerize(rowDiv, cellDivs);
+    // append the array of cell <div>'s to its parent row <div>
+    // finally resulting in an array of fully assembled row divs filled with cell divs
+    return containerize(rowDiv, cellDivsArr);
   });
 
   // append all rows to a parent gameboard div container
-  const assembledBoard = containerize(
-    `gameboard-container ${player}-gameboard`,
-    assembledRowDivs
+  const assembledGameboard = containerize(
+    `gameboard-container ${playerNameOrMode}-gameboard`,
+    assembledRowDivsArr
   );
 
   // add callback function as click event handler
-  if (clickCallback) assembledBoard.addEventListener('click', clickCallback);
+  if (clickCallback)
+    assembledGameboard.addEventListener('click', clickCallback);
 
-  return assembledBoard;
+  return assembledGameboard;
 };
 
 //
 // game play
 //
 
+//
 const renderGameModeLayout = () => {
   clearMain();
   containerize(
