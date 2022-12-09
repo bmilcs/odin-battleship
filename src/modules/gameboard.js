@@ -51,7 +51,7 @@ export default (boardSize = 10) => {
       );
       const diagonalCoordinates = getDiagonalCoordinates(coord);
       const diagonalCoordinatesAreClear = diagonalCoordinates.every(
-        (diagCoord) => areEmptyValidCoordinates(diagCoord)
+        (diagCoord) => areCoordinatesEmpty(diagCoord)
       );
       if (
         !touchingAnotherShip &&
@@ -170,10 +170,9 @@ export default (boardSize = 10) => {
         surroundingCells.push(adjCoord);
       });
       const diagonalCoordinates = getDiagonalCoordinates(coord);
-      diagonalCoordinates.forEach((diagCoord) => {
-        if (areCoordinatesInsideBoard(diagCoord))
-          surroundingCells.push(diagCoord);
-      });
+      diagonalCoordinates.forEach((diagCoord) =>
+        surroundingCells.push(diagCoord)
+      );
     });
 
     surroundingCells.forEach((coordToAttack) => receiveAttack(coordToAttack));
@@ -256,18 +255,17 @@ export default (boardSize = 10) => {
   };
 
   const getDiagonalCoordinates = (coordinates) => {
-    const cornerCoordinates = [];
+    const diagonalCoordinates = [];
     const [row, col] = coordinates;
 
-    cornerCoordinates.push([row - 1, col - 1]);
-    cornerCoordinates.push([row - 1, col + 1]);
-    cornerCoordinates.push([row + 1, col - 1]);
-    cornerCoordinates.push([row + 1, col + 1]);
+    diagonalCoordinates.push([row - 1, col - 1]);
+    diagonalCoordinates.push([row - 1, col + 1]);
+    diagonalCoordinates.push([row + 1, col - 1]);
+    diagonalCoordinates.push([row + 1, col + 1]);
 
-    return cornerCoordinates.filter((coord) => {
-      if (!areCoordinatesInsideBoard(coord)) return false;
-      return true;
-    });
+    return diagonalCoordinates.filter((coord) =>
+      areCoordinatesInsideBoard(coord)
+    );
   };
 
   const getAllCoordinatesBetween = (startPos, endPos) => {

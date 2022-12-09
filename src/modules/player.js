@@ -9,7 +9,7 @@ export function Player() {
 
   const attack = (coordinates, enemyBoardObj) => {
     // prevent repeat attacks on the same position
-    const repeatPlay = isRepeatPlay(coordinates);
+    const repeatPlay = isRepeatPlay(coordinates, enemyBoardObj);
     if (repeatPlay) return 'repeat';
 
     prevPlayedCoordinates.push(coordinates);
@@ -58,15 +58,13 @@ export function Player() {
   };
 
   // check if a set of coordinates has been played already
-  // * note: array.includes() doesn't work with nested arrays
-  const isRepeatPlay = (coordinates) => {
-    const [targetRow, targetCol] = coordinates;
-    const isARepeatPlay = prevPlayedCoordinates.some((coord) => {
-      const [prevPlayedRow, prevPlayedCol] = coord;
-      if (prevPlayedRow === targetRow && prevPlayedCol === targetCol)
-        return true;
-    });
-    return isARepeatPlay;
+  const isRepeatPlay = (coordinates, enemyBoardObj) => {
+    const [row, col] = coordinates;
+    const boardArr = enemyBoardObj.getcoord();
+    const valueOnBoard = boardArr[row][col];
+    if (typeof valueOnBoard === 'number') return false;
+    if (valueOnBoard === '') return false;
+    return true;
   };
 
   return {
@@ -102,7 +100,7 @@ export function Computer() {
     // prevent computer from making duplicate attacks
     while (true) {
       randomCoordinates = proto.generateRandomCoordinates(boardSize);
-      if (proto.isRepeatPlay(randomCoordinates)) continue;
+      if (proto.isRepeatPlay(randomCoordinates, enemyBoardObj)) continue;
       // ignore squares with no adjacent openings (can't possibly be a ship)
       const adjacentMoves = enemyBoardObj.getAllValidAdjacentCoordinates(
         randomCoordinates,

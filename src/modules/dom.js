@@ -258,7 +258,7 @@ const renderPreGame = (player) => {
   let shipDescription;
 
   shipSize
-    ? (shipDescription = `Place the ${shipSize}x ship on your gameboard. Right click rotates your ship.`)
+    ? (shipDescription = `Place the ${shipSize}x ship on your gameboard. Note: Right click rotates your ship.`)
     : (shipDescription = `Click on Start Game to begin! To start over, click the Reset button.`);
 
   const pregameBoardContainer = makeElement('div', 'pre-game-board-container');
