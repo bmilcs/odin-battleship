@@ -25,12 +25,15 @@
 }
 
 .pre-game-button-container {
-  display: grid;
-  grid-template-rows: repeat(auto-fit, minmax(min-content, 1fr));
+  display: flex;
 }
 
 .enemy-container,
 .player-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+
   padding: 1.25rem;
   border-radius: var(--border-radius-100);
   box-shadow: var(--box-shadow-900);
