@@ -60,7 +60,7 @@ export function Player() {
   // check if a set of coordinates has been played already
   const isRepeatPlay = (coordinates, enemyBoardObj) => {
     const [row, col] = coordinates;
-    const boardArr = enemyBoardObj.getcoord();
+    const boardArr = enemyBoardObj.getArray();
     const valueOnBoard = boardArr[row][col];
     if (typeof valueOnBoard === 'number') return false;
     if (valueOnBoard === '') return false;
