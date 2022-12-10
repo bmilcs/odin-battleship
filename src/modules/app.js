@@ -14,7 +14,6 @@ let turn;
 
 const startPreGame = () => {
   DOM.renderPreGame(player);
-  // placeShipsTest();
   turn = 'player';
 };
 
@@ -39,17 +38,6 @@ const startGamePlay = () => {
   DOM.renderGameModeLayout();
   DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
   DOM.renderPlayersTurn();
-};
-
-const placeShipsTest = () => {
-  const playerBoard = player.boardObj();
-  playerBoard.placeShip([0, 0], [0, 0]);
-  playerBoard.placeShip([2, 1], [2, 5]);
-  playerBoard.placeShip([9, 3], [7, 3]);
-  playerBoard.placeShip([1, 3], [1, 6]);
-  playerBoard.placeShip([6, 5], [5, 5]);
-  playerBoard.placeShip([3, 9], [3, 7]);
-  startGamePlay();
 };
 
 //
