@@ -23,6 +23,7 @@ footer {
 
     transition: var(--transition);
 
+    &,
     &:visited {
       color: var(--clr-neutral-900);
     }
