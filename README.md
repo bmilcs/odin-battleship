@@ -32,6 +32,13 @@ React is right around the corner and I'm excited to get into it, so I'll end my 
 
 ## Screenshots
 
+![Main Menu](src/assets/screenshot-1.png)
+![Pre-game Ship Placement Hover](src/assets/screenshot-2.png)
+![Pre-game Ship Placement Auto](src/assets/screenshot-3.png)
+![Gameplay Attack Enemy Ships](src/assets/screenshot-4.png)
+![Gameplay Enemy Attacks You](src/assets/screenshot-5.png)
+![Gameover Modal](src/assets/screenshot-6.png)
+
 ## Links
 
 - [Live Demo](https://bmilcs.github.io/odin-battleship/)
