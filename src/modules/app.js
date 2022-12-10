@@ -5,7 +5,6 @@ const start = () => {
   DOM.renderLayout();
   DOM.renderMainMenu();
   resetPlayerObjs();
-  // startPreGame();
 };
 
 let player;
