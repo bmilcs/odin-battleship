@@ -1,41 +1,45 @@
 import * as DOM from './dom';
 import * as Player from './player';
 
-const start = () => {
+// entry point for index.js
+const startApp = () => {
   DOM.renderLayout();
   DOM.renderMainMenu();
   resetPlayerObjs();
 };
 
-let player;
-let enemy;
+let playerObj;
+let enemyObj;
 let turn;
 
+const resetPlayerObjs = () => {
+  playerObj = Player.Player();
+  enemyObj = Player.Computer();
+  enemyObj.placeShipsRandomly();
+};
+
+// triggered by main menu's start game button
 const startPreGame = () => {
-  DOM.renderPreGame(player);
-  turn = 'player';
+  DOM.renderPreGame(playerObj);
 };
 
-const placeShipsRandomly = () => {
+// trigged by clicking 'auto' button in pregame
+const placePlayerShipsAutomatically = () => {
   resetPlayerObjs();
-  player.placeShipsRandomly();
-  DOM.renderPreGame(player);
+  playerObj.placeShipsRandomly();
+  DOM.renderPreGame(playerObj);
 };
 
+// triggered when 'play again' button is pressed after a game ends
 const playAgain = () => {
   resetPlayerObjs();
   startPreGame();
 };
 
-const resetPlayerObjs = () => {
-  player = Player.Player();
-  enemy = Player.Computer();
-  enemy.placeShipsRandomly();
-};
-
+// triggered after player places all ships & clicks start game button
 const startGamePlay = () => {
   DOM.renderGameModeLayout();
-  DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+  DOM.renderGameboardChanges(enemyObj.boardArr(), playerObj.boardArr());
   DOM.renderPlayersTurn();
 };
 
@@ -43,15 +47,17 @@ const startGamePlay = () => {
 // Game Play Mode
 //
 
+// triggered by player clicking on gameboard during gameplay
 const playerAttack = (coordinates) => {
   // capture result of a player's attack
-  const attackResults = player.attack(coordinates, enemy.boardObj());
+  const attackResults = playerObj.attack(coordinates, enemyObj.boardObj());
 
   // update screen w/ results of the attack
-  DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+  DOM.renderGameboardChanges(enemyObj.boardArr(), playerObj.boardArr());
 
   if (attackResults === 'game over') declareVictor('Player');
   else if (attackResults === 'miss') {
+    turn = 'enemy';
     DOM.renderEnemysTurn();
     initiateEnemyAttack();
   }
@@ -60,24 +66,28 @@ const playerAttack = (coordinates) => {
 // recursively attack at random until a miss or victory occurs
 const initiateEnemyAttack = (attackResults) => {
   setTimeout(() => {
-    turn = 'enemy';
-
+    // base case: missed attack
     if (attackResults === 'miss') {
       turn = 'player';
       DOM.renderPlayersTurn();
       return;
     }
 
+    // base case: computer wins games
     if (attackResults === 'game over') {
       declareVictor('Computer');
       return;
     }
-    DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
+
+    // update screen w/ both gameboards
+    DOM.renderGameboardChanges(enemyObj.boardArr(), playerObj.boardArr());
+
+    // recursively call smartAttack() method & update DOM
     setTimeout(() => {
-      initiateEnemyAttack(enemy.smartAttack(player.boardObj()));
-      DOM.renderGameboardChanges(enemy.boardArr(), player.boardArr());
-    }, 500);
-  }, 1000);
+      initiateEnemyAttack(enemyObj.smartAttack(playerObj.boardObj()));
+      DOM.renderGameboardChanges(enemyObj.boardArr(), playerObj.boardArr());
+    }, 400);
+  }, 1200);
 };
 
 const declareVictor = (victorName) => {
@@ -89,12 +99,12 @@ const getTurn = () => {
 };
 
 export {
-  start,
-  startPreGame,
+  startApp,
   resetPlayerObjs,
-  playAgain,
+  startPreGame,
   startGamePlay,
+  placePlayerShipsAutomatically,
   playerAttack,
-  placeShipsRandomly,
   getTurn,
+  playAgain,
 };

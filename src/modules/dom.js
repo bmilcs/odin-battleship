@@ -220,7 +220,7 @@ const renderPreGame = (player) => {
   };
 
   const handlePlaceShipsAutomatically = () => {
-    APP.placeShipsRandomly();
+    APP.placePlayerShipsAutomatically();
   };
 
   const handleResetShipPlacement = () => {
