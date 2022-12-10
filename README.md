@@ -26,6 +26,8 @@ This project was a blast and taught me the power of test driven development. Thi
 
 The real challenge and satisfaction came from implementing the computer's artificial intelligence. Having gone through linked lists and binary search trees recently, I was still feeling a little shaky about recursion, stacks and how they relate to real world problems. Following the 'Single Responsibility' principle, I had a great foundation of pre-built functions ready to go. Therefore, solving problems such as placing a ship randomly on the gameboard came about naturally by piecing together smaller solutions into a cohesive unit.
 
+The AI isn't perfect. It attacks at random until it gets lucky with a random coordinate. If I had the free time, I would've implemented a data structure of some kind to determine the best next random move, opting for spaces that have the largest # of unplayed adjacent moves. This would reduce the number of random attacks that fall next to one another, allowing the computer to hit larger open areas of unchartered territory.
+
 Ultimately, I was able to complete this project entirely on my own with very minimal Googling. Unlike previous projects, I spent a total of 2 weeks on this one (weekdays after work & weekends). As these projects grow in complexity, naming conventions, comments & organization are becoming vitally important so I spent a little extra time on this to ensure readability and maintability.
 
 React is right around the corner and I'm excited to get into it, so I'll end my summary here.
