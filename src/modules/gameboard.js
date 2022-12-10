@@ -1,10 +1,12 @@
 import Ship from './ship';
 
+//
 // Gameboard Factory
+//
 
 export default (boardSize = 10) => {
-  // create gameboard array: boardSize x boardSize dimensions
-  const create = (boardSize) => {
+  // on instantiation, a gameboard array is created & stored in boardArr
+  const createGameboardArr = (boardSize) => {
     let board = [];
     for (let row = 0; row < boardSize; row++) {
       board[row] = [];
@@ -16,7 +18,7 @@ export default (boardSize = 10) => {
   };
 
   // storage:
-  const boardArr = create(boardSize);
+  const boardArr = createGameboardArr(boardSize);
   const shipsArr = [];
 
   // place a ship on gameboard array, between start & end positions
@@ -24,7 +26,7 @@ export default (boardSize = 10) => {
     // get all cordinates between start & end position (row/column)
     const allCoordinates = getAllCoordinatesBetween(startPos, endPos);
 
-    // create ship: size is determined by how many coordinates it contains
+    // create ship: size is determined by how many coordinates it consists of
     const shipLength = allCoordinates.length;
     const shipObj = Ship(shipLength);
 
@@ -32,7 +34,7 @@ export default (boardSize = 10) => {
     shipObj.id = shipsArr.length;
     shipsArr.push(shipObj);
 
-    // add ship's id to allCoordinates within the gameboard array:
+    // add ship's id to allCoordinates within the gameboard array
     allCoordinates.forEach((coordinate) => {
       const [row, col] = coordinate;
       boardArr[row][col] = shipObj.id;
@@ -40,52 +42,48 @@ export default (boardSize = 10) => {
   };
 
   // returns true if ship can be placed between two coordinates
-  // ie: coordinates are within gameboard & coordinates are not sharing
-  // a common border with another ship
   const canPlaceShipBetween = (startPos, endPos) => {
     const allCoordinates = getAllCoordinatesBetween(startPos, endPos);
+
     return allCoordinates.every((coord) => {
+      // get coordinates above, below, to the left & right of a given coordinate
       const adjacentCoordinates = getAllValidAdjacentCoordinates(coord);
-      const touchingAnotherShip = adjacentCoordinates.some(
+      const isTouchingTheSideOfAnotherShip = adjacentCoordinates.some(
         (adjCoord) => !areCoordinatesEmpty(adjCoord)
       );
-      const diagonalCoordinates = getDiagonalCoordinates(coord);
-      const diagonalCoordinatesAreClear = diagonalCoordinates.every(
-        (diagCoord) => areCoordinatesEmpty(diagCoord)
+
+      // get coordinates that form the corners of a ship outline
+      // these appear when a ship is sunk, forming a border around it
+      const cornerCoordinates = getCornerCoordinates(coord);
+      const isTouchingTheCornerOfAnotherShip = cornerCoordinates.some(
+        (diagCoord) => !areCoordinatesEmpty(diagCoord)
       );
+
+      // all coordinates must pass the following conditions:
       if (
-        !touchingAnotherShip &&
-        diagonalCoordinatesAreClear &&
-        areEmptyValidCoordinates(coord)
+        !isTouchingTheSideOfAnotherShip &&
+        !isTouchingTheCornerOfAnotherShip &&
+        areCoordinatesInsideBoard(coord) &&
+        areCoordinatesEmpty(coord)
       )
         return true;
     });
   };
 
-  // calculate end coordinate, given a starting position, direction & ship size
+  // calculate end coordinate for a ship, given a starting position, direction & ship size
   const getEndCoordinate = (startPos, direction, shipSize) => {
     const [startRow, startCol] = startPos;
     let endRow = startRow;
     let endCol = startCol;
 
-    if (direction === 'vertical') {
-      endCol = startCol;
-      endRow += shipSize - 1;
-    } else {
-      endRow = startRow;
-      endCol += shipSize - 1;
-    }
+    direction === 'vertical'
+      ? (endRow += shipSize - 1)
+      : (endCol += shipSize - 1);
 
     return [endRow, endCol];
   };
 
-  const areEmptyValidCoordinates = (coordinates) => {
-    if (!areCoordinatesInsideBoard(coordinates)) return false;
-    if (!areCoordinatesEmpty(coordinates)) return false;
-    return true;
-  };
-
-  const areUnplayedValidCoordinates = (coordinates) => {
+  const areCoordinatesUnplayedInsideBoard = (coordinates) => {
     if (!areCoordinatesInsideBoard(coordinates)) return false;
     if (!areCoordinatesUnplayed(coordinates)) return false;
     return true;
@@ -120,27 +118,35 @@ export default (boardSize = 10) => {
   const receiveAttack = (coordinates) => {
     const [row, col] = coordinates;
     const currentValueOnBoard = boardArr[row][col];
+    const coordinatesContainAShip = typeof currentValueOnBoard === 'number';
 
-    // pure number = untouched ship ID
-    if (typeof currentValueOnBoard === 'number') {
+    if (coordinatesContainAShip) {
       const shipID = currentValueOnBoard;
       const shipObj = shipsArr[shipID];
       shipObj.hit();
+
       if (shipObj.isSunk()) {
         sinkShipInGameboardArray(shipID);
-        markAdjacentSunkCoordinatesAsMisses();
-      } else boardArr[row][col] += 'X';
+        sinkOutlineAroundSunkShips();
+      } else {
+        // add 'X' to current value, representing a hit
+        // ie: "3X", ship.id = 3, "X" = hit
+        boardArr[row][col] += 'X';
+      }
 
       if (areAllShipsSunk()) return 'game over';
-
-      return shipObj.isSunk() ? 'sunk' : 'hit';
+      if (shipObj.isSunk()) return 'sunk';
+      return 'hit';
     } else {
+      // coordinates do not contain a ship
       boardArr[row][col] = 'M';
       return 'miss';
     }
   };
 
-  // when a final blow is landed on a ship, causing it to sink,
+  const areAllShipsSunk = () => shipsArr.every((ship) => ship.isSunk());
+
+  // when a final blow is landed, causing a ship to sink,
   // update all references to that ship to "#S" in the gameboard array
   // where # = ship.id and "S" = sunk
   const sinkShipInGameboardArray = (shipID) => {
@@ -152,11 +158,14 @@ export default (boardSize = 10) => {
     });
   };
 
-  const areAllShipsSunk = () => shipsArr.every((ship) => ship.isSunk());
-
-  const markAdjacentSunkCoordinatesAsMisses = () => {
+  // when a final blow is landed, causing a ship to sink,
+  // attack all valid coordinates that make up an outline/border around it.
+  // these coordinates are always empty, resulting in misses
+  const sinkOutlineAroundSunkShips = () => {
     const allSunkCoordinates = [];
     const surroundingCells = [];
+
+    // get coordinates of all sunk ships
     for (let row = 0; row < boardSize; row++) {
       for (let col = 0; col < boardSize; col++) {
         if (boardArr[row][col].toString().includes('S'))
@@ -164,99 +173,116 @@ export default (boardSize = 10) => {
       }
     }
 
+    // get all adjacent & corner coordinates around a sunk ship, forming it's border
     allSunkCoordinates.forEach((coord) => {
       const adjacentCoordinates = getAllValidAdjacentCoordinates(coord);
       adjacentCoordinates.forEach((adjCoord) => {
         surroundingCells.push(adjCoord);
       });
-      const diagonalCoordinates = getDiagonalCoordinates(coord);
-      diagonalCoordinates.forEach((diagCoord) =>
+      const cornerCoordinates = getCornerCoordinates(coord);
+      cornerCoordinates.forEach((diagCoord) =>
         surroundingCells.push(diagCoord)
       );
     });
 
+    // finally, update all surrounding cells with 'miss'
     surroundingCells.forEach((coordToAttack) => receiveAttack(coordToAttack));
   };
 
-  //
-  // utility functions
-  //
-
-  // get valid moves along the axis of 2 successful hits
+  // get valid moves along the same axis of 2 successful hits
+  // * used by the enemy/computer's smart attack AI
   const getLinearNextMoves = (startPos, endPos) => {
     const linearNextMoves = [];
     const [startRow, startCol] = startPos;
     const [endRow, endCol] = endPos;
-    let coord;
+    let coordinate;
 
+    // if start/end position of 2 succuessful hits share a common row
+    // the next move must be on a new column
     if (endRow === startRow) {
       let currentCol = startCol;
+
+      // loop in a positive & then in a negative direction, along the same row,
+      // until a missed attack, coordinate that falls outside the boundaries of the board
+      // or an unplayed coordinate is found. if unplayed, add it to linearNextMoves.
       while (true) {
-        coord = [startRow, currentCol++];
-        if (!areCoordinatesInsideBoard(coord)) break;
-        if (areCoordinatesAMiss(coord)) break;
-        if (areCoordinatesUnplayed(coord)) {
-          linearNextMoves.push(coord);
+        coordinate = [startRow, currentCol++];
+        if (!areCoordinatesInsideBoard(coordinate)) break;
+        if (areCoordinatesAMiss(coordinate)) break;
+        if (areCoordinatesUnplayed(coordinate)) {
+          linearNextMoves.push(coordinate);
           break;
         }
       }
       currentCol = startCol;
       while (true) {
-        coord = [startRow, currentCol--];
-        if (!areCoordinatesInsideBoard(coord)) break;
-        if (areCoordinatesAMiss(coord)) break;
-        if (areCoordinatesUnplayed(coord)) {
-          linearNextMoves.push(coord);
+        coordinate = [startRow, currentCol--];
+        if (!areCoordinatesInsideBoard(coordinate)) break;
+        if (areCoordinatesAMiss(coordinate)) break;
+        if (areCoordinatesUnplayed(coordinate)) {
+          linearNextMoves.push(coordinate);
           break;
         }
       }
     } else {
+      // start/end position share a common column: the next moves must be on a different row
       let currentRow = startRow;
+
+      // loop in a positive & then in a negative direction, along the same column,
+      // until a missed attack, coordinate that falls outside the boundaries of the board
+      // or an unplayed coordinate is found. if unplayed, add it to linearNextMoves.
       while (true) {
-        coord = [currentRow++, startCol];
-        if (!areCoordinatesInsideBoard(coord)) break;
-        if (areCoordinatesAMiss(coord)) break;
-        if (areCoordinatesUnplayed(coord)) {
-          linearNextMoves.push(coord);
+        coordinate = [currentRow++, startCol];
+        if (!areCoordinatesInsideBoard(coordinate)) break;
+        if (areCoordinatesAMiss(coordinate)) break;
+        if (areCoordinatesUnplayed(coordinate)) {
+          linearNextMoves.push(coordinate);
           break;
         }
       }
       currentRow = startRow;
       while (true) {
-        coord = [currentRow--, startCol];
-        if (!areCoordinatesInsideBoard(coord)) break;
-        if (areCoordinatesAMiss(coord)) break;
-        if (areCoordinatesUnplayed(coord)) {
-          linearNextMoves.push(coord);
+        coordinate = [currentRow--, startCol];
+        if (!areCoordinatesInsideBoard(coordinate)) break;
+        if (areCoordinatesAMiss(coordinate)) break;
+        if (areCoordinatesUnplayed(coordinate)) {
+          linearNextMoves.push(coordinate);
           break;
         }
       }
     }
 
+    // finally return all valid linear next moves
     return linearNextMoves;
   };
 
+  // given a coordinate & a player or enemy's gameboard, return all valid adjacent coordinates:
+  // ie: positions to the left, right, above and below a coordinate
   const getAllValidAdjacentCoordinates = (coordinates, boardObj = '') => {
     const [row, col] = coordinates;
-
     const allPossibleMoves = [];
+
     allPossibleMoves.push([row + 1, col]);
     allPossibleMoves.push([row - 1, col]);
     allPossibleMoves.push([row, col + 1]);
     allPossibleMoves.push([row, col - 1]);
 
+    // filter out coordinates that are outside the gameboard OR coordinates
+    // that have been played already
     const validNextMoves = allPossibleMoves.filter((coordinates) => {
       return !boardObj
-        ? areUnplayedValidCoordinates(coordinates)
-        : boardObj.areUnplayedValidCoordinates(coordinates);
+        ? areCoordinatesUnplayedInsideBoard(coordinates)
+        : boardObj.areCoordinatesUnplayedInsideBoard(coordinates);
     });
 
     return validNextMoves;
   };
 
-  const getDiagonalCoordinates = (coordinates) => {
-    const diagonalCoordinates = [];
+  // given a coordinate, return coordinates around it that share a common corner
+  // ie: coordinates above/left, above/right, below/left, below/right
+  const getCornerCoordinates = (coordinates) => {
     const [row, col] = coordinates;
+    const diagonalCoordinates = [];
 
     diagonalCoordinates.push([row - 1, col - 1]);
     diagonalCoordinates.push([row - 1, col + 1]);
@@ -268,24 +294,24 @@ export default (boardSize = 10) => {
     );
   };
 
+  // given any two coordinates, return them & all coordinates that lie between them
   const getAllCoordinatesBetween = (startPos, endPos) => {
-    let allCoordinates = [];
     const [startRow, startCol] = startPos;
     const [endRow, endCol] = endPos;
-
-    // determine if coordinates span vertically or horizontally
-    const rowDiff = Math.abs(startRow - endRow);
+    let allCoordinates = [];
 
     // if ship is placed vertically, get all row #'s between start/end pos
-    if (rowDiff > 0) {
-      const rowNumbers = getAllNumbersBetween(startRow, endRow);
-      allCoordinates = rowNumbers.map((row) => {
+    if (startCol === endCol) {
+      const allRowNumbers = getAllNumbersBetween(startRow, endRow);
+      // assemble final coordinates, given a list of rows
+      allCoordinates = allRowNumbers.map((row) => {
         return [row, startCol];
       });
     } else {
       // ship is place horizontally: get all col #'s between start/end pos
-      const colNumbers = getAllNumbersBetween(startCol, endCol);
-      allCoordinates = colNumbers.map((col) => {
+      const allColumnNumbers = getAllNumbersBetween(startCol, endCol);
+      // assemble final coordinates, given a list of columns
+      allCoordinates = allColumnNumbers.map((col) => {
         return [startRow, col];
       });
     }
@@ -297,7 +323,6 @@ export default (boardSize = 10) => {
   const getAllNumbersBetween = (x, y) => {
     const numbers = [];
     let high, low;
-
     if (x > y) {
       high = x;
       low = y;
@@ -305,7 +330,6 @@ export default (boardSize = 10) => {
       high = y;
       low = x;
     }
-
     for (let i = low; i <= high; i++) numbers.push(i);
     return numbers;
   };
@@ -322,11 +346,10 @@ export default (boardSize = 10) => {
     getLinearNextMoves,
     areCoordinatesEmpty,
     areCoordinatesInsideBoard,
-    areEmptyValidCoordinates,
-    areUnplayedValidCoordinates,
+    areCoordinatesUnplayedInsideBoard,
     canPlaceShipBetween,
     placeShip,
-    markAdjacentSunkCoordinatesAsMisses,
+    sinkOutlineAroundSunkShips,
     receiveAttack,
     areAllShipsSunk,
   };
