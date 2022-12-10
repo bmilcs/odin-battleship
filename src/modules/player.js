@@ -1,23 +1,12 @@
 import Gameboard from './gameboard';
 
-// Player Factory
+//
+// player factory: used by player & computer objects
+//
 
 export function Player() {
-  const prevPlayedCoordinates = [];
   const gameboardObj = Gameboard();
   const placeShipList = [2, 3, 3, 4, 5];
-
-  const attack = (coordinates, enemyBoardObj) => {
-    // prevent repeat attacks on the same position
-    const repeatPlay = isRepeatPlay(coordinates, enemyBoardObj);
-    if (repeatPlay) return 'repeat';
-
-    prevPlayedCoordinates.push(coordinates);
-
-    // receiveAttack returns hit, miss or game over,
-    // which is controlled by app.js
-    return enemyBoardObj.receiveAttack(coordinates);
-  };
 
   const boardObj = () => {
     return gameboardObj;
@@ -27,22 +16,31 @@ export function Player() {
     return gameboardObj.getArray();
   };
 
-  const generateRandomCoordinates = (boardSize) => {
-    const randomRow = randomInt(0, boardSize - 1);
-    const randomCol = randomInt(0, boardSize - 1);
-    return [randomRow, randomCol];
+  const attack = (coordinates, enemyBoardObj) => {
+    // prevent repeat attacks on the same position
+    const repeatPlay = isRepeatPlay(coordinates, enemyBoardObj);
+    if (repeatPlay) return 'repeat';
+
+    // receiveAttack returns hit, sunk, miss or game over,
+    // which is controlled by app.js
+    return enemyBoardObj.receiveAttack(coordinates);
   };
 
-  const randomInt = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  // check if a set of coordinates has been played already
+  const isRepeatPlay = (coordinates, enemyBoardObj) => {
+    const [row, col] = coordinates;
+    const boardArr = enemyBoardObj.getArray();
+    const valueOnBoard = boardArr[row][col];
+    if (typeof valueOnBoard === 'number') return false;
+    if (valueOnBoard === '') return false;
+    return true;
   };
 
-  // recursively place enemy ships on gameboard using a stack
+  // recursively place ships on a gameboard using a stack
   const placeShipsRandomly = () => {
     const shipSize = placeShipList.pop();
     if (shipSize === undefined) return;
 
-    // const boardObj = boardObj();
     const boardSize = gameboardObj.getArray().length;
     let startPos, endPos, shipDirection, canPlaceShipHere;
 
@@ -57,14 +55,14 @@ export function Player() {
     placeShipsRandomly();
   };
 
-  // check if a set of coordinates has been played already
-  const isRepeatPlay = (coordinates, enemyBoardObj) => {
-    const [row, col] = coordinates;
-    const boardArr = enemyBoardObj.getArray();
-    const valueOnBoard = boardArr[row][col];
-    if (typeof valueOnBoard === 'number') return false;
-    if (valueOnBoard === '') return false;
-    return true;
+  const generateRandomCoordinates = (boardSize) => {
+    const randomRow = randomInt(0, boardSize - 1);
+    const randomCol = randomInt(0, boardSize - 1);
+    return [randomRow, randomCol];
+  };
+
+  const randomInt = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 
   return {
@@ -78,45 +76,70 @@ export function Player() {
   };
 }
 
-// Computer Factory (inherits from Player factory)
+//
+// computer factory: inherits from Player factory
+//
 
 export function Computer() {
   const proto = Player();
 
-  //
-  // attacking functions
-  //
-
+  // arrays used by computer to make intelligent decisions once a random attack
+  // results in a hit
   const successfulAttacks = [];
   const adjacentNextMoveStack = [];
   const linearNextMovesStack = [];
 
-  // randomly attack a positon on the enemy's board
-  const randomAttack = (enemyBoardObj) => {
-    const boardArr = enemyBoardObj.getArray();
-    const boardSize = boardArr.length;
-    let randomCoordinates;
-
-    // prevent computer from making duplicate attacks
-    while (true) {
-      randomCoordinates = proto.generateRandomCoordinates(boardSize);
-      if (proto.isRepeatPlay(randomCoordinates, enemyBoardObj)) continue;
-      // ignore squares with no adjacent openings (can't possibly be a ship)
-      const adjacentMoves = enemyBoardObj.getAllValidAdjacentCoordinates(
-        randomCoordinates,
-        enemyBoardObj
-      );
-      if (adjacentMoves.length > 0) break;
+  const smartAttack = (enemyBoardObj) => {
+    // if no intelligent next moves exist, attack at random
+    if (
+      successfulAttacks.length === 0 &&
+      adjacentNextMoveStack.length === 0 &&
+      linearNextMovesStack.length === 0
+    ) {
+      return randomAttack(enemyBoardObj);
     }
 
-    // attack(): returns 'hit', 'miss', 'game over' (app.js gameflow)
-    const attackResults = proto.attack(randomCoordinates, enemyBoardObj);
-    smartAttackResultsHandler(attackResults, randomCoordinates);
+    // if the last move resulted in a hit but no linear/adjacent moves are present
+    // add all valid adjacent moves: we want to attack in a cross like formation
+    if (
+      adjacentNextMoveStack.length === 0 &&
+      linearNextMovesStack.length === 0 &&
+      successfulAttacks.length === 1
+    ) {
+      const lastHit = successfulAttacks[0];
+      const nextMoves = enemyBoardObj.getAllValidAdjacentCoordinates(
+        lastHit,
+        enemyBoardObj
+      );
+      nextMoves.forEach((move) => adjacentNextMoveStack.push(move));
+    }
+
+    // if 2+ hits have landed on a ship but it isn't sunk yet
+    if (successfulAttacks.length > 1) {
+      // we don't want to attack in a cross formation anymore:
+      clearAdjacentNextMovesStack();
+
+      // add linear next moves to its own stack
+      const startPos = successfulAttacks[0];
+      const endPos = successfulAttacks[successfulAttacks.length - 1];
+      const linearMoves = enemyBoardObj.getLinearNextMoves(startPos, endPos);
+      linearMoves.forEach((move) => linearNextMovesStack.push(move));
+    }
+
+    let coordinatesToAttack;
+
+    // if adjacent moves exist, attack those. otherwise, attack linearly.
+    adjacentNextMoveStack.length > 0
+      ? (coordinatesToAttack = adjacentNextMoveStack.pop())
+      : (coordinatesToAttack = linearNextMovesStack.pop());
+
+    const attackResults = proto.attack(coordinatesToAttack, enemyBoardObj);
+    handleAttackResultsIntelligently(attackResults, coordinatesToAttack);
 
     return attackResults;
   };
 
-  const smartAttackResultsHandler = (attackResults, coordinates) => {
+  const handleAttackResultsIntelligently = (attackResults, coordinates) => {
     if (attackResults === 'hit') successfulAttacks.push(coordinates);
     if (attackResults === 'sunk') {
       clearAdjacentNextMovesStack();
@@ -141,51 +164,32 @@ export function Computer() {
     while (array.length > 0) array.pop();
   };
 
-  // smart attack
-  const smartAttack = (enemyBoardObj) => {
-    // no hits recently
-    if (
-      successfulAttacks.length === 0 &&
-      adjacentNextMoveStack.length === 0 &&
-      linearNextMovesStack.length === 0
-    ) {
-      return randomAttack(enemyBoardObj);
-    }
+  // when no logical next moves exist, attack at random
+  const randomAttack = (enemyBoardObj) => {
+    const boardArr = enemyBoardObj.getArray();
+    const boardSize = boardArr.length;
+    let randomCoordinates;
 
-    // last move = hit, but no smart moves have been added to stack
-    // add all valid adjacent moves
-    if (
-      adjacentNextMoveStack.length === 0 &&
-      linearNextMovesStack.length === 0 &&
-      successfulAttacks.length === 1
-    ) {
-      const lastHit = successfulAttacks[successfulAttacks.length - 1];
-      const nextMoves = enemyBoardObj.getAllValidAdjacentCoordinates(
-        lastHit,
+    // loop until the random set of coordinates meets the requrements:
+    while (true) {
+      // 1) are not a repeat a attack
+      randomCoordinates = proto.generateRandomCoordinates(boardSize);
+      if (proto.isRepeatPlay(randomCoordinates, enemyBoardObj)) continue;
+
+      // 2) have at least 1 adjacent unplayed coordinate. why?
+      // it can't possibly contain a ship during a random attack
+      const adjacentMoves = enemyBoardObj.getAllValidAdjacentCoordinates(
+        randomCoordinates,
         enemyBoardObj
       );
-      nextMoves.forEach((move) => adjacentNextMoveStack.push(move));
+
+      if (adjacentMoves.length > 0) break;
     }
 
-    // 2+ successful hits have landed & ship is not sunk yet
-    // get next valid linear moves
-    if (successfulAttacks.length > 1) {
-      clearAdjacentNextMovesStack();
-      const startPos = successfulAttacks[0];
-      const endPos = successfulAttacks[1];
+    const attackResults = proto.attack(randomCoordinates, enemyBoardObj);
+    handleAttackResultsIntelligently(attackResults, randomCoordinates);
 
-      const linearMoves = enemyBoardObj.getLinearNextMoves(startPos, endPos);
-      linearMoves.forEach((move) => linearNextMovesStack.push(move));
-    }
-
-    let coordinates;
-
-    adjacentNextMoveStack.length > 0
-      ? (coordinates = adjacentNextMoveStack.pop())
-      : (coordinates = linearNextMovesStack.pop());
-
-    const attackResults = proto.attack(coordinates, enemyBoardObj);
-    smartAttackResultsHandler(attackResults, coordinates);
+    // attack(): returns 'hit', 'sunk', 'miss', 'game over' (handled by app.js gameflow)
     return attackResults;
   };
 
