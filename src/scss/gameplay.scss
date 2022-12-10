@@ -19,7 +19,7 @@
 }
 
 .pre-game-board-container {
-  max-width: max(350px, 50vw);
+  scale: 0.9;
   padding: 1.25rem;
   margin: 1.5rem;
   background: var(--clr-primary-800);
