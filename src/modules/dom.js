@@ -78,7 +78,7 @@ const clearMain = () => clearChildren(main);
 
 const renderMainMenu = () => {
   const startPreGameBtn = makeElement('button', 'start-btn', 'Start Game');
-  startPreGameBtn.addEventListener('click', startPreGameHandler);
+  startPreGameBtn.addEventListener('click', handleStartPreGame);
 
   // create <div class='main-menu-card'> and append <p> & <button> to it
   const mainMenuCard = containerize(
@@ -108,7 +108,7 @@ const prepMainLogo = () => {
   );
 };
 
-const startPreGameHandler = () => {
+const handleStartPreGame = () => {
   APP.resetPlayerObjs();
   APP.startPreGame();
 };
@@ -138,7 +138,7 @@ const renderPreGame = (player) => {
   let shipDirection = 'vertical';
 
   // click: place ship at given coordinate
-  const placeShipClickHandler = (e) => {
+  const handlePlaceShipClick = (e) => {
     const coordinatesAttr = e.target.getAttribute('coordinates');
     if (coordinatesAttr === null) return;
 
@@ -154,7 +154,7 @@ const renderPreGame = (player) => {
   };
 
   // adds hover effect when hover enters a new cell
-  const placeShipMouseEnter = (e) => {
+  const handlePlaceShipMouseEnter = (e) => {
     const coordinatesAttr = e.target.getAttribute('coordinates');
     if (coordinatesAttr === null) return;
     displayHoverEffect(coordinatesAttr);
@@ -194,12 +194,12 @@ const renderPreGame = (player) => {
   };
 
   // on mouse hover leaving a cell
-  const placeShipMouseLeave = () => {
+  const handlePlaceShipMouseLeave = () => {
     clearAllHoverEffects();
   };
 
   // rotate ship event: occurs on right click
-  const rotateDirectionHandler = (e) => {
+  const handleRotateDirection = (e) => {
     e.preventDefault();
     const coordinatesAttr = e.target.getAttribute('coordinates');
     if (coordinatesAttr === null) return;
@@ -211,7 +211,7 @@ const renderPreGame = (player) => {
   };
 
   // start game button functionality
-  const startGameHandler = () => {
+  const handleStartGame = () => {
     // prevent starting the game until all ships are placed
     // shipSize becomes undefined when the last ship is placed: placeShipList.pop()
     if (shipSize !== undefined) return;
@@ -219,11 +219,11 @@ const renderPreGame = (player) => {
     APP.startGamePlay();
   };
 
-  const placeShipsAutomaticallyHandler = () => {
+  const handlePlaceShipsAutomatically = () => {
     APP.placeShipsRandomly();
   };
 
-  const resetShipPlacementHandler = () => {
+  const handleResetShipPlacement = () => {
     APP.resetPlayerObjs();
     APP.startPreGame();
   };
@@ -232,7 +232,7 @@ const renderPreGame = (player) => {
   clearChildren(main);
 
   const startGameBtn = makeElement('button', 'start-game-btn', 'Start Game');
-  startGameBtn.addEventListener('click', startGameHandler);
+  startGameBtn.addEventListener('click', handleStartGame);
 
   const placeShipsAutomaticallyBtn = makeElement(
     'button',
@@ -241,7 +241,7 @@ const renderPreGame = (player) => {
   );
   placeShipsAutomaticallyBtn.addEventListener(
     'click',
-    placeShipsAutomaticallyHandler
+    handlePlaceShipsAutomatically
   );
 
   const resetShipPlacementBtn = makeElement(
@@ -249,16 +249,16 @@ const renderPreGame = (player) => {
     'reset-ship-placement-btn',
     'Reset'
   );
-  resetShipPlacementBtn.addEventListener('click', resetShipPlacementHandler);
+  resetShipPlacementBtn.addEventListener('click', handleResetShipPlacement);
 
   let gameboard;
 
   // if ships still need to be placed down, add all event handlers to the gameboard
   if (shipSize !== undefined) {
-    gameboard = prepBoard(boardArr, 'pre-game', placeShipClickHandler);
-    gameboard.addEventListener('mouseover', placeShipMouseEnter);
-    gameboard.addEventListener('mouseout', placeShipMouseLeave);
-    gameboard.addEventListener('contextmenu', rotateDirectionHandler);
+    gameboard = prepBoard(boardArr, 'pre-game', handlePlaceShipClick);
+    gameboard.addEventListener('mouseover', handlePlaceShipMouseEnter);
+    gameboard.addEventListener('mouseout', handlePlaceShipMouseLeave);
+    gameboard.addEventListener('contextmenu', handleRotateDirection);
   } else {
     // otherwise, render gameboard without hover/click effects
     gameboard = prepBoard(boardArr, 'pre-game');
@@ -363,7 +363,6 @@ const prepBoard = (boardArr, playerNameOrMode, clickCallback) => {
 // game play
 //
 
-//
 const renderGameModeLayout = () => {
   clearMain();
   containerize(
@@ -382,7 +381,7 @@ const renderEnemyBoardContainer = (enemyBoardArr) => {
   const enemyBoardElements = prepBoard(
     enemyBoardArr,
     'enemy',
-    attackClickHandler
+    handleAttackClick
   );
   const h2 = makeElement('h2', 'gameboard-header', 'Fire away!');
   containerize(enemyContainer, h2, enemyBoardElements);
@@ -395,7 +394,7 @@ const renderPlayerBoardContainer = (playerBoardArr) => {
   containerize(playerContainer, h2, playerBoardElements);
 };
 
-const attackClickHandler = (e) => {
+const handleAttackClick = (e) => {
   if (APP.getTurn() === 'enemy') return;
   const coordinatesAttr = e.target.getAttribute('coordinates');
   if (coordinatesAttr === null) return;
@@ -420,13 +419,13 @@ const renderEnemysTurn = () => {
 const renderGameWinner = (victorName) => {
   const gameOverModal = makeElement('div', 'game-over-modal');
   const playAgainBtn = makeElement('button', 'play-again-btn', 'Play Again');
-  playAgainBtn.addEventListener('click', playAgainClickHandler);
+  playAgainBtn.addEventListener('click', handlePlayAgain);
   const returnMainMenuBtn = makeElement(
     'button',
     'return-main-menu-btn',
     'Main Menu'
   );
-  returnMainMenuBtn.addEventListener('click', returnMainMenuHandler);
+  returnMainMenuBtn.addEventListener('click', handleReturnToMainMenu);
 
   let header;
   let p;
@@ -458,12 +457,12 @@ const closeGameWinner = () => {
   gameOverModal.remove();
 };
 
-const playAgainClickHandler = (e) => {
+const handlePlayAgain = (e) => {
   closeGameWinner();
   APP.playAgain();
 };
 
-const returnMainMenuHandler = (e) => {
+const handleReturnToMainMenu = (e) => {
   closeGameWinner();
   clearMain();
   renderMainMenu();
