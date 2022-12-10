@@ -10,8 +10,10 @@ Welcome to Bryan Miller's Battleship Project, the [eighteenth assignment](https:
 - NPM
   - Jest
   - Webpack
+    - raw-loader for SVG handling
   - Babel
   - ESLint
+  - Airbnb
   - Prettier
 
 ## Summary
